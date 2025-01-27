@@ -1,16 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   return (
     <SafeAreaView>
-      <ScrollView>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Index page</Text>
-        </View>
-      </ScrollView>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Index page</Text>
+      </View>
     </SafeAreaView>
   );
 }
