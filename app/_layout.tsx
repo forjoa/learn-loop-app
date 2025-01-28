@@ -16,7 +16,7 @@ export default function RootLayout() {
   const { user } = useAuth()
 
   if (!user) {
-    return <Redirect href="/(auth)/index"/>
+    return <Redirect href="/(auth)"/>
   }
 
   useEffect(() => {

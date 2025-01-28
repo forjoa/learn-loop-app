@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { TextInput, View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { Href, Link, router } from 'expo-router';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -12,6 +12,10 @@ export default function Login() {
   const handleLogin = async () => {
     await login(email, password);
   };
+
+  const goTo = (route: Href) => {
+    router.push(route)
+  }
 
   return (
     <SafeAreaView style={styles.page}>
@@ -27,11 +31,11 @@ export default function Login() {
           <Text style={styles.textPrimary}>Enviar</Text>
         </Pressable>
         <View style={styles.hr}/>
-        <Pressable style={styles.secondary}>
+        <Pressable style={styles.secondary} onPress={() => goTo('/(auth)/register')}>
           <Text style={styles.textSecondary}>Regístrate</Text>
         </Pressable>
-        <View>
-          <Link href={'/(auth)/index'}>¿Olvidaste la contraseña?</Link>
+        <View style={styles.linkContainer}>
+          <Link style={styles.link} href={'/(auth)/register'}>¿Olvidaste la contraseña?</Link>
         </View>
       </View>
     </SafeAreaView>
@@ -113,5 +117,15 @@ const styles = StyleSheet.create({
   },
   textSecondary: {
     color: '#016BFF'
+  },
+  link: {
+    color: '#016BFF',
+    textDecorationLine: 'underline',
+    textDecorationColor: '#016BFF'
+  },
+  linkContainer: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'flex-end'
   }
 })
