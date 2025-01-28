@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TextInput, View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { TextInput, View, Text, StyleSheet, Image, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Href, Link, router } from 'expo-router';
@@ -19,7 +19,10 @@ export default function Login() {
 
   return (
     <SafeAreaView style={styles.page}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={require('@/assets/images/droid.png')} />
         </View>
@@ -34,10 +37,7 @@ export default function Login() {
         <Pressable style={styles.secondary} onPress={() => goTo('/(auth)/register')}>
           <Text style={styles.textSecondary}>Regístrate</Text>
         </Pressable>
-        <View style={styles.linkContainer}>
-          <Link style={styles.link} href={'/(auth)/register'}>¿Olvidaste la contraseña?</Link>
-        </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -113,19 +113,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderLeftWidth: 0.5,
     borderRightWidth: 0.5,
-    borderColor: '#50545D'
+    borderColor: '#50545D',
+    marginBottom: 25
   },
   textSecondary: {
     color: '#016BFF'
-  },
-  link: {
-    color: '#016BFF',
-    textDecorationLine: 'underline',
-    textDecorationColor: '#016BFF'
-  },
-  linkContainer: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'flex-end'
   }
-})
+});
