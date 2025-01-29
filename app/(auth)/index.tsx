@@ -11,6 +11,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     await login(email, password);
+    router.push('/(tabs)')
   };
 
   const goTo = (route: Href) => {
