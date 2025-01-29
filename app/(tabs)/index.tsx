@@ -6,7 +6,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Index page</Text>
+        <Text style={styles.title}>Home page</Text>
       </View>
     </SafeAreaView>
   );
