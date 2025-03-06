@@ -1,6 +1,6 @@
-import { Stack } from 'expo-router';
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Stack } from 'expo-router'
+import React from 'react'
+import { StyleSheet, Text } from 'react-native'
 
 export default function NotFoundScreen() {
   return (
@@ -8,5 +8,5 @@ export default function NotFoundScreen() {
       <Stack.Screen options={{ title: 'Oops!' }} />
       <Text>This screen doesn't exists</Text>
     </>
-  );
+  )
 }

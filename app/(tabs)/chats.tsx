@@ -1,17 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native'
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function ChatsScreen() {
   return (
-      <SafeAreaView>
-        <View>
-          <Text style={styles.title}>
-            Chats page
-          </Text>
-        </View>
-      </SafeAreaView>
-  );
+    <SafeAreaView>
+      <View>
+        <Text style={styles.title}>Chats page</Text>
+      </View>
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -20,6 +18,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    color: '#fff'
-  }
-});
+    color: '#fff',
+  },
+})
