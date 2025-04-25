@@ -8,6 +8,7 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native'
 import { useAuth } from '@/hooks/useAuth'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -16,11 +17,21 @@ import { Href, Link, router } from 'expo-router'
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { login } = useAuth()
+  const { login, loading, error } = useAuth()
+  const [loginError, setLoginError] = useState<string | null>(null)
 
   const handleLogin = async () => {
-    await login(email, password)
-    router.push('/(tabs)')
+    if (!email || !password) {
+      setLoginError('Por favor, ingresa tu email y contraseña')
+      return
+    }
+
+    const result = await login(email, password)
+    if (result.success) {
+      router.push('/(tabs)')
+    } else {
+      setLoginError(result.error || 'Error al iniciar sesión')
+    }
   }
 
   const goTo = (route: Href) => {
@@ -51,13 +62,24 @@ export default function Login() {
         />
         <TextInput
           style={styles.input}
-          placeholder="****"
+          placeholder="******"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
-        <Pressable style={styles.primary} onPress={handleLogin}>
-          <Text style={styles.textPrimary}>Enviar</Text>
+        {loginError && (
+          <Text style={styles.errorText}>{loginError}</Text>
+        )}
+        <Pressable 
+          style={[styles.primary, loading && styles.disabledButton]} 
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.textPrimary}>Enviar</Text>
+          )}
         </Pressable>
         <View style={styles.hr} />
         <Pressable
@@ -77,6 +99,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
+  },
+  errorText: {
+    color: '#FF4D4F',
+    fontSize: 14,
+    marginTop: -15,
+    marginBottom: -10,
+  },
+  disabledButton: {
+    opacity: 0.7,
+    backgroundColor: '#6E87B7',
   },
   container: {
     backgroundColor: '#1F1F21',
