@@ -1,10 +1,11 @@
 import { Tabs } from 'expo-router'
 import React, { useState } from 'react'
-import { StyleSheet, View, Pressable } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import Feather from '@expo/vector-icons/Feather'
 
 import { Colors } from '@/constants/Colors'
 import NewBottomSheet from '@/components/NewBottomSheet'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function TabLayout() {
     const [isNewBottomSheetVisible, setIsNewBottomSheetVisible] = useState(false)
@@ -15,6 +16,15 @@ export default function TabLayout() {
                 screenOptions={{
                     tabBarActiveTintColor: Colors['dark'].tint,
                     headerShown: true,
+                    header: () => (
+                        <SafeAreaView style={styles.header}>
+                            <Image
+                                style={styles.image}
+                                source={require('@/assets/images/droid.png')}
+                            />
+                            <Text style={styles.headerTitle}>Learn Loop</Text>
+                        </SafeAreaView>
+                    ),
                     tabBarStyle: styles.nav,
                 }}
             >
@@ -105,5 +115,30 @@ const styles = StyleSheet.create({
         elevation: 5,
         borderWidth: 1,
         borderColor: '#4090FF',
+    },
+    image: {
+        width: 50,
+        height: 50,
+    },
+    header: {
+        display: 'flex',
+        flexDirection: 'row',
+        backgroundColor: '#1F1F21',
+        borderBottomWidth: 2,
+        borderLeftWidth: 0.5,
+        borderRightWidth: 0.5,
+        borderColor: '#353638',
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        alignItems: 'center',
+        overflow: 'hidden',
+        paddingLeft: 20,
+        paddingBottom: -15
+    },
+    headerTitle: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 20,
     },
 })
