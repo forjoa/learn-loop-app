@@ -9,11 +9,13 @@ import {
   ScrollView,
   TextInput,
   ImageURISource,
+  useColorScheme,
 } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Href, router } from 'expo-router'
 import { KeyboardAvoidingView, Platform } from 'react-native'
+import { Colors } from '@/constants/Colors'
 
 const profileImages: Record<string, ImageSourcePropType> = {
   'ant.png': require('@/assets/images/profile/ant.png'),
@@ -67,6 +69,7 @@ export default function Register() {
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('STUDENT')
   const [profileImage, setProfileImage] = useState(profileImages['ant.png'])
+  const colorScheme = useColorScheme() || 'dark'
 
   const handleRegister = () => {
     console.log({ name, email, password, role, profileImage })
@@ -83,7 +86,10 @@ export default function Register() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          style={styles.container}
+          style={[
+            styles.container,
+            { backgroundColor: Colors[colorScheme].card }
+          ]}
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
         >
@@ -93,20 +99,40 @@ export default function Register() {
               source={require('@/assets/images/droid.png')}
             />
           </View>
-          <Text style={styles.title}>Registro</Text>
-          <Text style={styles.span}>
+          <Text style={[
+            styles.title,
+            { color: Colors[colorScheme].text }
+          ]}>Registro</Text>
+          <Text style={[
+            styles.span,
+            { color: Colors[colorScheme].textSecondary }
+          ]}>
             Crea una cuenta para comenzar a aprender o enseñar
           </Text>
 
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              { 
+                backgroundColor: Colors[colorScheme].input,
+                color: Colors[colorScheme].text 
+              }
+            ]}
             placeholder="Nombre"
+            placeholderTextColor={Colors[colorScheme].textSecondary}
             value={name}
             onChangeText={setName}
           />
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              { 
+                backgroundColor: Colors[colorScheme].input,
+                color: Colors[colorScheme].text 
+              }
+            ]}
             placeholder="Email"
+            placeholderTextColor={Colors[colorScheme].textSecondary}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -114,8 +140,15 @@ export default function Register() {
 
           {/* Campo de contraseña */}
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              { 
+                backgroundColor: Colors[colorScheme].input,
+                color: Colors[colorScheme].text 
+              }
+            ]}
             placeholder="****"
+            placeholderTextColor={Colors[colorScheme].textSecondary}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -125,16 +158,33 @@ export default function Register() {
           <Picker
             selectedValue={role}
             onValueChange={(itemValue: string) => setRole(itemValue)}
-            style={styles.picker}
+            style={[
+              styles.picker,
+              { 
+                backgroundColor: Colors[colorScheme].input,
+                color: Colors[colorScheme].text 
+              }
+            ]}
             itemStyle={styles.pickerItem}
             mode="dropdown"
           >
-            <Picker.Item label="Estudiante" value="STUDENT" />
-            <Picker.Item label="Profesor" value="TEACHER" />
+            <Picker.Item 
+              label="Estudiante" 
+              value="STUDENT" 
+              color={colorScheme === 'dark' ? '#fff' : '#000'}
+            />
+            <Picker.Item 
+              label="Profesor" 
+              value="TEACHER" 
+              color={colorScheme === 'dark' ? '#fff' : '#000'}
+            />
           </Picker>
 
           {/* Selección de imagen de perfil */}
-          <Text style={styles.sectionTitle}>Selecciona tu foto de perfil</Text>
+          <Text style={[
+            styles.sectionTitle,
+            { color: Colors[colorScheme].text }
+          ]}>Selecciona tu foto de perfil</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -146,7 +196,10 @@ export default function Register() {
                 onPress={() => setProfileImage(image as ImageURISource)}
                 style={[
                   styles.profileOption,
-                  profileImage === image && styles.profileSelected,
+                  profileImage === image && [
+                    styles.profileSelected,
+                    { borderColor: Colors[colorScheme].primary }
+                  ],
                 ]}
               >
                 <Image
@@ -158,15 +211,42 @@ export default function Register() {
           </ScrollView>
 
           {/* Botón de registro */}
-          <Pressable style={styles.primary} onPress={handleRegister}>
-            <Text style={styles.textPrimary}>Registrarse</Text>
+          <Pressable 
+            style={[
+              styles.primary,
+              { 
+                backgroundColor: Colors[colorScheme].primary,
+                borderColor: Colors[colorScheme].primaryBorder 
+              }
+            ]} 
+            onPress={handleRegister}
+          >
+            <Text style={[
+              styles.textPrimary,
+              { color: Colors[colorScheme].text }
+            ]}>Registrarse</Text>
           </Pressable>
 
-          <View style={styles.hr} />
+          <View style={[
+            styles.hr,
+            { backgroundColor: Colors[colorScheme].border }
+          ]} />
 
           {/* Enlace para ir al login */}
-          <Pressable style={styles.secondary} onPress={() => goTo('/(auth)')}>
-            <Text style={styles.textSecondary}>Inicia sesión</Text>
+          <Pressable 
+            style={[
+              styles.secondary,
+              { 
+                backgroundColor: Colors[colorScheme].secondary.background,
+                borderColor: Colors[colorScheme].secondary.border 
+              }
+            ]} 
+            onPress={() => goTo('/(auth)')}
+          >
+            <Text style={[
+              styles.textSecondary,
+              { color: Colors[colorScheme].secondary.text }
+            ]}>Inicia sesión</Text>
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -184,7 +264,6 @@ const styles = StyleSheet.create({
   container: {
     width: '90%',
     marginVertical: 20,
-    backgroundColor: '#1F1F21',
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
@@ -203,28 +282,22 @@ const styles = StyleSheet.create({
     height: 100,
   },
   title: {
-    color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
   },
   span: {
-    color: '#50545D',
     textAlign: 'center',
     marginBottom: 20,
   },
   input: {
-    backgroundColor: '#353638',
-    color: '#fff',
     paddingHorizontal: 12,
     paddingVertical: 15,
     borderRadius: 10,
     marginBottom: 15,
   },
   picker: {
-    backgroundColor: '#353638',
-    color: '#fff',
     borderRadius: 10,
     marginBottom: 15,
   },
@@ -232,7 +305,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   sectionTitle: {
-    color: '#fff',
     fontWeight: 'bold',
     marginBottom: 10,
   },
@@ -246,7 +318,6 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   profileSelected: {
-    borderColor: '#016BFF',
   },
   profileImage: {
     width: 60,
@@ -254,7 +325,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   primary: {
-    backgroundColor: '#016BFF',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 15,
@@ -263,18 +333,14 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderLeftWidth: 0.5,
     borderRightWidth: 0.5,
-    borderColor: '#4090FF',
   },
   textPrimary: {
-    color: '#fff',
   },
   hr: {
-    backgroundColor: '#353638',
     height: 1,
     marginVertical: 20,
   },
   secondary: {
-    backgroundColor: '#353638',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 15,
@@ -282,10 +348,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderLeftWidth: 0.5,
     borderRightWidth: 0.5,
-    borderColor: '#50545D',
     marginBottom: 25,
   },
   textSecondary: {
-    color: '#016BFF',
   },
 })

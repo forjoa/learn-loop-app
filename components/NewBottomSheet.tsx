@@ -7,6 +7,7 @@ import {
     TouchableWithoutFeedback,
     Dimensions,
     Modal,
+    ColorSchemeName,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {
@@ -20,6 +21,7 @@ import Animated, {
     withTiming,
     runOnJS,
 } from 'react-native-reanimated'
+import { Colors } from '@/constants/Colors'
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50
@@ -27,15 +29,18 @@ const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50
 type NewBottomSheetProps = {
     isVisible: boolean
     onClose: () => void
+    colorScheme?: ColorSchemeName
 }
 
 export default function NewBottomSheet({
                                            isVisible,
                                            onClose,
+                                           colorScheme = 'dark',
                                        }: NewBottomSheetProps) {
     const translateY = useSharedValue(0)
     const backdropOpacity = useSharedValue(0)
     const context = useSharedValue({ y: 0 })
+    const theme = colorScheme || 'dark'
 
     const scrollTo = (
         destination: number,
@@ -89,15 +94,42 @@ export default function NewBottomSheet({
         <Modal transparent visible={isVisible} animationType="none">
             {/* animated backdrop */}
             <TouchableWithoutFeedback onPress={() => scrollTo(0, onClose)}>
-                <Animated.View style={[styles.backdrop, rBackdropStyle]} />
+                <Animated.View 
+                    style={[
+                        styles.backdrop, 
+                        rBackdropStyle, 
+                        { backgroundColor: Colors[theme].backdrop }
+                    ]} 
+                />
             </TouchableWithoutFeedback>
 
             {/* gestures sheet */}
             <GestureDetector gesture={gesture}>
-                <Animated.View style={[styles.sheet, rSheetStyle]}>
-                    <View style={styles.line} />
+                <Animated.View 
+                    style={[
+                        styles.sheet, 
+                        rSheetStyle, 
+                        { 
+                            backgroundColor: Colors[theme].card,
+                            borderColor: Colors[theme].border 
+                        }
+                    ]}
+                >
+                    <View 
+                        style={[
+                            styles.line, 
+                            { backgroundColor: Colors[theme].line }
+                        ]} 
+                    />
                     <SafeAreaView style={styles.content}>
-                        <Text style={styles.title}>Add new content</Text>
+                        <Text 
+                            style={[
+                                styles.title, 
+                                { color: Colors[theme].text }
+                            ]}
+                        >
+                            Add new content
+                        </Text>
                     </SafeAreaView>
                 </Animated.View>
             </GestureDetector>
@@ -108,7 +140,6 @@ export default function NewBottomSheet({
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
         position: 'absolute',
         width: '100%',
         height: '100%',
@@ -117,19 +148,16 @@ const styles = StyleSheet.create({
     sheet: {
         height: SCREEN_HEIGHT,
         width: '100%',
-        backgroundColor: '#1F1F21',
         position: 'absolute',
         top: SCREEN_HEIGHT,
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
         borderWidth: 1,
-        borderColor: '#353638',
         zIndex: 20,
     },
     line: {
         width: 75,
         height: 4,
-        backgroundColor: 'grey',
         alignSelf: 'center',
         marginVertical: 15,
         borderRadius: 2,
@@ -139,7 +167,6 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        color: '#fff',
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,

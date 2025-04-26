@@ -9,16 +9,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  useColorScheme,
 } from 'react-native'
 import { useAuth } from '@/hooks/useAuth'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Href, Link, router } from 'expo-router'
+import { Colors } from '@/constants/Colors'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { login, loading, error } = useAuth()
   const [loginError, setLoginError] = useState<string | null>(null)
+  const colorScheme = useColorScheme() || 'dark'
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -42,7 +45,10 @@ export default function Login() {
     <SafeAreaView style={styles.page}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
+        style={[
+          styles.container,
+          { backgroundColor: Colors[colorScheme].card }
+        ]}
       >
         <View style={styles.imageContainer}>
           <Image
@@ -50,43 +56,91 @@ export default function Login() {
             source={require('@/assets/images/droid.png')}
           />
         </View>
-        <Text style={styles.title}>Login</Text>
-        <Text style={styles.span}>
+        <Text style={[
+          styles.title,
+          { color: Colors[colorScheme].text }
+        ]}>Login</Text>
+        <Text style={[
+          styles.span,
+          { color: Colors[colorScheme].textSecondary }
+        ]}>
           Bienvenido de nuevo a tu plataforma de aprendizaje favorita
         </Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { 
+              backgroundColor: Colors[colorScheme].input,
+              color: Colors[colorScheme].text 
+            }
+          ]}
           placeholder="Email"
+          placeholderTextColor={Colors[colorScheme].textSecondary}
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { 
+              backgroundColor: Colors[colorScheme].input,
+              color: Colors[colorScheme].text 
+            }
+          ]}
           placeholder="******"
+          placeholderTextColor={Colors[colorScheme].textSecondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
         {loginError && (
-          <Text style={styles.errorText}>{loginError}</Text>
+          <Text style={[
+            styles.errorText,
+            { color: Colors[colorScheme].error }
+          ]}>{loginError}</Text>
         )}
         <Pressable 
-          style={[styles.primary, loading && styles.disabledButton]} 
+          style={[
+            styles.primary, 
+            { 
+              backgroundColor: Colors[colorScheme].primary,
+              borderColor: Colors[colorScheme].primaryBorder 
+            },
+            loading && [
+              styles.disabledButton,
+              { backgroundColor: Colors[colorScheme].disabledButton }
+            ]
+          ]} 
           onPress={handleLogin}
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={Colors[colorScheme].text} />
           ) : (
-            <Text style={styles.textPrimary}>Enviar</Text>
+            <Text style={[
+              styles.textPrimary,
+              { color: Colors[colorScheme].text }
+            ]}>Enviar</Text>
           )}
         </Pressable>
-        <View style={styles.hr} />
+        <View style={[
+          styles.hr,
+          { backgroundColor: Colors[colorScheme].border }
+        ]} />
         <Pressable
-          style={styles.secondary}
+          style={[
+            styles.secondary,
+            { 
+              backgroundColor: Colors[colorScheme].secondary.background,
+              borderColor: Colors[colorScheme].secondary.border 
+            }
+          ]}
           onPress={() => goTo('/(auth)/register')}
         >
-          <Text style={styles.textSecondary}>Regístrate</Text>
+          <Text style={[
+            styles.textSecondary,
+            { color: Colors[colorScheme].secondary.text }
+          ]}>Regístrate</Text>
         </Pressable>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -101,17 +155,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   errorText: {
-    color: '#FF4D4F',
     fontSize: 14,
     marginTop: -15,
     marginBottom: -10,
   },
   disabledButton: {
     opacity: 0.7,
-    backgroundColor: '#6E87B7',
   },
   container: {
-    backgroundColor: '#1F1F21',
     width: '80%',
     padding: 30,
     borderRadius: 20,
@@ -129,24 +180,19 @@ const styles = StyleSheet.create({
     height: 100,
   },
   title: {
-    color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: -20,
   },
   span: {
-    color: '#50545D',
     marginTop: -10,
   },
   input: {
-    backgroundColor: '#353638',
-    color: '#fff',
     paddingHorizontal: 12,
     paddingVertical: 15,
     borderRadius: 10,
   },
   primary: {
-    backgroundColor: '#016BFF',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -155,17 +201,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderLeftWidth: 0.5,
     borderRightWidth: 0.5,
-    borderColor: '#4090FF',
   },
   textPrimary: {
-    color: '#fff',
   },
   hr: {
-    backgroundColor: '#353638',
     height: 1,
   },
   secondary: {
-    backgroundColor: '#353638',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -174,10 +216,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderLeftWidth: 0.5,
     borderRightWidth: 0.5,
-    borderColor: '#50545D',
     marginBottom: 25,
   },
   textSecondary: {
-    color: '#016BFF',
   },
 })

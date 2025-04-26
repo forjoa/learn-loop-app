@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router'
 import React, { useState } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View, useColorScheme } from 'react-native'
 import Feather from '@expo/vector-icons/Feather'
 
 import { Colors } from '@/constants/Colors'
@@ -9,23 +9,40 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function TabLayout() {
     const [isNewBottomSheetVisible, setIsNewBottomSheetVisible] = useState(false)
+    const colorScheme = useColorScheme() || 'dark'
 
     return (
         <>
             <Tabs
                 screenOptions={{
-                    tabBarActiveTintColor: Colors['dark'].tint,
+                    tabBarActiveTintColor: Colors[colorScheme].tint,
                     headerShown: true,
                     header: () => (
-                        <SafeAreaView style={styles.header}>
+                        <SafeAreaView style={[
+                            styles.header, 
+                            { 
+                                backgroundColor: Colors[colorScheme].header.background,
+                                borderColor: Colors[colorScheme].header.border 
+                            }
+                        ]}>
                             <Image
                                 style={styles.image}
                                 source={require('@/assets/images/droid.png')}
                             />
-                            <Text style={styles.headerTitle}>Learn Loop</Text>
+                            <Text style={[
+                                styles.headerTitle, 
+                                { color: Colors[colorScheme].header.text }
+                            ]}>Learn Loop</Text>
                         </SafeAreaView>
                     ),
-                    tabBarStyle: styles.nav,
+                    tabBarStyle: [
+                        styles.nav, 
+                        { 
+                            backgroundColor: Colors[colorScheme].nav.background,
+                            borderColor: Colors[colorScheme].nav.border,
+                            color: Colors[colorScheme].tabIconDefault
+                        }
+                    ],
                 }}
             >
                 <Tabs.Screen
@@ -33,7 +50,7 @@ export default function TabLayout() {
                     options={{
                         title: 'Home',
                         tabBarIcon: ({focused}) => <Feather name="home" size={24}
-                                                            color={focused ? Colors['dark'].tabIconSelected : '#50545D'}/>,
+                                                            color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
                     }}
                 />
                 <Tabs.Screen
@@ -42,7 +59,7 @@ export default function TabLayout() {
                         title: 'Chats',
                         tabBarIcon: ({focused}) => (
                             <Feather name="message-circle" size={24}
-                                     color={focused ? Colors['dark'].tabIconSelected : '#50545D'}/>
+                                     color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>
                         ),
                     }}
                 />
@@ -57,8 +74,14 @@ export default function TabLayout() {
                     options={{
                         title: '',
                         tabBarIcon: () => (
-                            <View style={styles.newButton}>
-                                <Feather name="plus" size={30} color="#fff"/>
+                            <View style={[
+                                styles.newButton, 
+                                { 
+                                    backgroundColor: Colors[colorScheme].newButton.background,
+                                    borderColor: Colors[colorScheme].newButton.border 
+                                }
+                            ]}>
+                                <Feather name="plus" size={30} color={Colors[colorScheme].text}/>
                             </View>
                         ),
                     }}
@@ -68,7 +91,7 @@ export default function TabLayout() {
                     options={{
                         title: 'Notificaciones',
                         tabBarIcon: ({focused}) => <Feather name="bell" size={24}
-                                                            color={focused ? Colors['dark'].tabIconSelected : '#50545D'}/>,
+                                                            color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
                     }}
                 />
                 <Tabs.Screen
@@ -76,7 +99,7 @@ export default function TabLayout() {
                     options={{
                         title: 'Profile',
                         tabBarIcon: ({focused}) => <Feather name="user" size={24}
-                                                            color={focused ? Colors['dark'].tabIconSelected : '#50545D'}/>,
+                                                            color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
                     }}
                 />
             </Tabs>
@@ -84,6 +107,7 @@ export default function TabLayout() {
             <NewBottomSheet
                 isVisible={isNewBottomSheetVisible}
                 onClose={() => setIsNewBottomSheetVisible(false)}
+                colorScheme={colorScheme}
             />
         </>
     )
@@ -91,20 +115,16 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
     nav: {
-        backgroundColor: '#1F1F21',
-        color: '#50545D',
         paddingTop: 12,
         borderTopWidth: 2,
         borderLeftWidth: 0.5,
         borderRightWidth: 0.5,
-        borderColor: '#353638',
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
         position: 'absolute',
         marginBottom: 24
     },
     newButton: {
-        backgroundColor: '#016BFF',
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -114,7 +134,6 @@ const styles = StyleSheet.create({
         bottom: 5,
         elevation: 5,
         borderWidth: 1,
-        borderColor: '#4090FF',
     },
     image: {
         width: 50,
@@ -123,11 +142,9 @@ const styles = StyleSheet.create({
     header: {
         display: 'flex',
         flexDirection: 'row',
-        backgroundColor: '#1F1F21',
         borderBottomWidth: 2,
         borderLeftWidth: 0.5,
         borderRightWidth: 0.5,
-        borderColor: '#353638',
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
         alignItems: 'center',
@@ -136,7 +153,6 @@ const styles = StyleSheet.create({
         paddingBottom: -15
     },
     headerTitle: {
-        color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
         marginLeft: 20,
