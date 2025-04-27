@@ -1,24 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
+import {  StyleSheet, Text, useColorScheme } from 'react-native'
 
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { Colors } from '@/constants/Colors'
+import Main from '@/components/ui/Main'
 
 export default function HomeScreen() {
-  return (
-    <SafeAreaView>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Home page</Text>
-      </View>
-    </SafeAreaView>
-  )
+    const colorScheme = useColorScheme() || 'dark'
+
+    return (
+        <Main>
+            <Text style={{color: Colors[colorScheme].text}}>Aquí encontrarás todos tus temas actuales</Text>
+        </Main>
+    )
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  title: {
-    color: '#fff',
-  },
-})
+const styles = StyleSheet.create({})
