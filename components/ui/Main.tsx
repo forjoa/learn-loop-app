@@ -25,7 +25,7 @@ export default function Main({children}: { children: ReactNode }) {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
             >
-                <View style={styles.childrenContainer}>
+                <View style={styles.childrenContainer} key={refreshing ? "refreshing" : "not-refreshing"}>
                     {children}
                 </View>
             </ScrollView>
