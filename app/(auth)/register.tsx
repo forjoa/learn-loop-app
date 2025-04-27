@@ -202,7 +202,7 @@ export default function Register() {
                     >
                         <Text style={[
                             styles.textPrimary,
-                            {color: Colors[colorScheme].text}
+                            {color: '#fff'}
                         ]}>{registering ? 'Registrando...' : 'Registrarse'}</Text>
                     </Pressable>
 

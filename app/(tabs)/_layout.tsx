@@ -80,7 +80,7 @@ export default function TabLayout() {
                                     borderColor: Colors[colorScheme].newButton.border 
                                 }
                             ]}>
-                                <Feather name="plus" size={30} color={Colors[colorScheme].text}/>
+                                <Feather name="plus" size={30} color='#fff'/>
                             </View>
                         ),
                     }}
@@ -114,14 +114,13 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
     nav: {
-        paddingTop: 12,
+        paddingTop: 8,
         borderTopWidth: 2,
         borderLeftWidth: 0.5,
         borderRightWidth: 0.5,
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
         position: 'absolute',
-        marginBottom: 24,
     },
     newButton: {
         width: 60,

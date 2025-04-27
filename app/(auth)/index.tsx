@@ -119,7 +119,7 @@ export default function Login() {
           ) : (
             <Text style={[
               styles.textPrimary,
-              { color: Colors[colorScheme].text }
+              { color: '#fff' }
             ]}>Enviar</Text>
           )}
         </Pressable>
