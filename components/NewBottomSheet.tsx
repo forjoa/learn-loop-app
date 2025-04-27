@@ -1,4 +1,3 @@
-// components/NewBottomSheet.tsx
 import React, { useEffect } from 'react'
 import {
     StyleSheet,
@@ -47,7 +46,7 @@ export default function NewBottomSheet({
         callback?: () => void
     ) => {
         'worklet'
-        translateY.value = withSpring(destination, { damping: 20 })
+        translateY.value = withSpring(destination, { damping: 15 })
         backdropOpacity.value = withTiming(
             destination === 0 ? 0 : 1,
             { duration: 300 },
@@ -92,7 +91,6 @@ export default function NewBottomSheet({
 
     return (
         <Modal transparent visible={isVisible} animationType="none">
-            {/* animated backdrop */}
             <TouchableWithoutFeedback onPress={() => scrollTo(0, onClose)}>
                 <Animated.View 
                     style={[
@@ -103,7 +101,6 @@ export default function NewBottomSheet({
                 />
             </TouchableWithoutFeedback>
 
-            {/* gestures sheet */}
             <GestureDetector gesture={gesture}>
                 <Animated.View 
                     style={[
