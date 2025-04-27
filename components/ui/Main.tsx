@@ -1,8 +1,10 @@
 import { ReactNode, useCallback, useState } from 'react'
 import { RefreshControl, ScrollView, StyleSheet, useColorScheme, View } from 'react-native'
+import { Colors } from '@/constants/Colors'
 
 export default function Main({children}: { children: ReactNode }) {
     const [refreshing, setRefreshing] = useState(false)
+    const colorScheme = useColorScheme() || 'dark'
 
     const onRefresh = useCallback(() => {
         setRefreshing(true)
@@ -10,16 +12,22 @@ export default function Main({children}: { children: ReactNode }) {
             setRefreshing(false)
         }, 1000)
     }, [])
-    const colorScheme = useColorScheme() || 'dark'
+
     return (
         <View style={styles.titleContainer}>
             <ScrollView
-                contentContainerStyle={styles.scrollView}
+                style={styles.scrollView}
+                contentContainerStyle={styles.contentContainer}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
                 }
+                horizontal={false}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
             >
-                {children}
+                <View style={styles.childrenContainer}>
+                    {children}
+                </View>
             </ScrollView>
         </View>
     )
@@ -27,15 +35,18 @@ export default function Main({children}: { children: ReactNode }) {
 
 const styles = StyleSheet.create({
     titleContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        gap: 8,
+        flex: 1,
         padding: 18,
         width: '100%',
-        flex: 1
     },
     scrollView: {
+        flex: 1,
+    },
+    contentContainer: {
+        flexGrow: 1,
+        width: '100%',
+    },
+    childrenContainer: {
         flex: 1,
         width: '100%',
     },

@@ -9,17 +9,18 @@ import 'react-native-reanimated'
 import { StyleSheet, useColorScheme } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Colors } from '@/constants/Colors'
+import { ActivityIndicator, View } from 'react-native'
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-    const [loaded] = useFonts({
+    const [fontsLoaded] = useFonts({
         SpaceMono: require('../assets/fonts/Geist-Regular.ttf'),
     })
-    const {user} = useAuth()
+
+    const { user, loading: authLoading } = useAuth()
     const colorScheme = useColorScheme() || 'dark'
 
-    // Create custom themes based on our Colors constants
     const customDarkTheme = {
         ...DarkTheme,
         colors: {
@@ -44,30 +45,40 @@ export default function RootLayout() {
         },
     }
 
-    // Select theme based on system preference
     const theme = colorScheme === 'dark' ? customDarkTheme : customLightTheme
 
-    if (!user) {
-        return <Redirect href="/(auth)"/>
-    }
-
     useEffect(() => {
-        if (loaded) {
+        if (fontsLoaded && !authLoading) {
             SplashScreen.hideAsync()
         }
-    }, [loaded])
+    }, [fontsLoaded, authLoading])
 
-    if (!loaded) {
-        return null
+    if (!fontsLoaded || authLoading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+                <ActivityIndicator size="large" />
+            </View>
+        )
     }
 
     return (
         <GestureHandlerRootView style={styles.container}>
             <ThemeProvider value={theme}>
-                <Stack>
-                    <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-                    <Stack.Screen name="(auth)" options={{headerShown: false}}/>
-                    <Stack.Screen name="+not-found"/>
+                <Stack screenOptions={{ headerShown: false }}>
+                    {user ? (
+                        <>
+                            <Stack.Screen
+                                name="(tabs)"
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen name="+not-found"/>
+                        </>
+                    ) : (
+                        <Stack.Screen
+                            name="(auth)"
+                            options={{ headerShown: false }}
+                        />
+                    )}
                 </Stack>
                 <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'}/>
             </ThemeProvider>

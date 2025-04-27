@@ -47,7 +47,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="index"
                     options={{
-                        title: 'Home',
+                        title: 'Inicio',
                         tabBarIcon: ({focused}) => <Feather name="home" size={24}
                                                             color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
                     }}
@@ -96,7 +96,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="profile"
                     options={{
-                        title: 'Profile',
+                        title: 'Perfil',
                         tabBarIcon: ({focused}) => <Feather name="user" size={24}
                                                             color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
                     }}

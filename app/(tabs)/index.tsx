@@ -1,4 +1,4 @@
-import {  StyleSheet, Text, useColorScheme } from 'react-native'
+import { StyleSheet, Text, useColorScheme } from 'react-native'
 
 import { Colors } from '@/constants/Colors'
 import Main from '@/components/ui/Main'
@@ -8,7 +8,7 @@ export default function HomeScreen() {
 
     return (
         <Main>
-            <Text style={{color: Colors[colorScheme].text}}>Aquí encontrarás todos tus temas actuales</Text>
+            <Text style={[{color: Colors[colorScheme].text}]}>Aquí encontrarás todos tus temas.</Text>
         </Main>
     )
 }

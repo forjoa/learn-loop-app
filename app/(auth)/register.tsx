@@ -10,13 +10,19 @@ import {
     useColorScheme,
     Alert,
 } from 'react-native'
-import { Picker } from '@react-native-picker/picker'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Href, router } from 'expo-router'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import { Colors } from '@/constants/Colors'
 import { profileImages } from '@/assets/profile-images'
 import { useAuth } from '@/hooks/useAuth'
+import { MaterialIcons } from '@expo/vector-icons'
+import SelectDropdown from 'react-native-select-dropdown'
+
+const roles = [
+    {label: 'Estudiante', value: 'STUDENT'},
+    {label: 'Profesor', value: 'TEACHER'}
+]
 
 export default function Register() {
     const [name, setName] = useState('')
@@ -26,7 +32,7 @@ export default function Register() {
     const [profileImage, setProfileImage] = useState('ant.png')
     const [registering, setRegistering] = useState(false)
     const colorScheme = useColorScheme() || 'dark'
-    const { register, error } = useAuth()
+    const {register, error} = useAuth()
 
     const handleRegister = async () => {
         if (!name || !email || !password) {
@@ -39,10 +45,8 @@ export default function Register() {
             const result = await register(name, email, password, role, profileImage)
 
             if (result.success) {
-                // Registro exitoso, redirigir al login
                 router.push('/(auth)')
             } else {
-                // Mostrar error
                 Alert.alert('Error', result.error || 'Hubo un problema al registrarse')
             }
         } catch (err) {
@@ -115,7 +119,6 @@ export default function Register() {
                         keyboardType="email-address"
                     />
 
-                    {/* Campo de contraseña */}
                     <TextInput
                         style={[
                             styles.input,
@@ -131,33 +134,65 @@ export default function Register() {
                         secureTextEntry
                     />
 
-                    {/* Selector de rol */}
-                    <Picker
-                        selectedValue={role}
-                        onValueChange={(itemValue: string) => setRole(itemValue)}
-                        style={[
-                            styles.picker,
+                    <SelectDropdown
+                        data={roles}
+                        onSelect={(selectedItem) => setRole(selectedItem.value)}
+                        renderButton={(selectedItem, isOpened) => (
+                            <View style={[
+                                styles.dropdownButton,
+                                {
+                                    backgroundColor: Colors[colorScheme].input,
+                                    borderColor: Colors[colorScheme].border
+                                }
+                            ]}>
+                                <Text style={[
+                                    styles.dropdownButtonText,
+                                    {
+                                        color: Colors[colorScheme].text,
+                                        // fontSize: 16
+                                    }
+                                ]}>
+                                    {selectedItem?.label || 'Seleccionar rol'}
+                                </Text>
+                                <MaterialIcons
+                                    name={isOpened ? 'arrow-drop-up' : 'arrow-drop-down'}
+                                    size={24}
+                                    color={Colors[colorScheme].text}
+                                />
+                            </View>
+                        )}
+                        renderItem={(item, index, isSelected) => (
+                            <View style={[
+                                styles.dropdownItem,
+                                isSelected && {
+                                    backgroundColor: Colors[colorScheme].primary + '20'
+                                },
+                                {
+                                    backgroundColor: Colors[colorScheme].input,
+                                    backdropFilter: 'blur(10px)'
+                                }
+                            ]}>
+                                <Text style={[
+                                    styles.dropdownItemText,
+                                    {
+                                        color: Colors[colorScheme].text,
+                                        // fontSize: 16
+                                    }
+                                ]}>
+                                    {item.label}
+                                </Text>
+                            </View>
+                        )}
+                        dropdownStyle={[
+                            styles.dropdown,
                             {
                                 backgroundColor: Colors[colorScheme].input,
-                                color: Colors[colorScheme].text
+                                borderColor: Colors[colorScheme].border,
+                                marginTop: 5
                             }
                         ]}
-                        itemStyle={styles.pickerItem}
-                        mode="dropdown"
-                    >
-                        <Picker.Item
-                            label="Estudiante"
-                            value="STUDENT"
-                            color={colorScheme === 'dark' ? '#fff' : '#000'}
-                        />
-                        <Picker.Item
-                            label="Profesor"
-                            value="TEACHER"
-                            color={colorScheme === 'dark' ? '#fff' : '#000'}
-                        />
-                    </Picker>
+                    />
 
-                    {/* Selección de imagen de perfil */}
                     <Text style={[
                         styles.sectionTitle,
                         {color: Colors[colorScheme].text}
@@ -174,20 +209,18 @@ export default function Register() {
                                 style={[
                                     styles.profileOption,
                                     profileImage === image && [
-                                        styles.profileSelected,
                                         {borderColor: Colors[colorScheme].primary}
                                     ],
                                 ]}
                             >
                                 <Image
-                                    source={profileImages[image]} // Usas directamente la referencia de `profileImages`
+                                    source={profileImages[image]}
                                     style={styles.profileImage}
                                 />
                             </Pressable>
                         ))}
                     </ScrollView>
 
-                    {/* Botón de registro */}
                     <Pressable
                         style={[
                             styles.primary,
@@ -211,7 +244,6 @@ export default function Register() {
                         {backgroundColor: Colors[colorScheme].border}
                     ]}/>
 
-                    {/* Enlace para ir al login */}
                     <Pressable
                         style={[
                             styles.secondary,
@@ -276,31 +308,28 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 15,
     },
-    picker: {
-        borderRadius: 10,
-        marginBottom: 15,
-    },
-    pickerItem: {
-        fontSize: 12,
-    },
     sectionTitle: {
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginVertical: 10,
     },
     profileScroll: {
-        marginBottom: 20,
+        // marginBottom: 20,
     },
     profileOption: {
         marginRight: 10,
-        borderRadius: 50,
+        width: 64,
+        height: 64,
+        borderRadius: 32,
         borderWidth: 2,
         borderColor: 'transparent',
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    profileSelected: {},
     profileImage: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
     },
     primary: {
         justifyContent: 'center',
@@ -328,4 +357,32 @@ const styles = StyleSheet.create({
         marginBottom: 25,
     },
     textSecondary: {},
+    dropdownButton: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 300,
+        height: 50,
+        borderRadius: 10,
+        borderWidth: 1,
+        paddingHorizontal: 15
+    },
+    dropdownButtonText: {
+        flex: 1,
+        // fontSize: 16
+    },
+    dropdown: {
+        borderRadius: 10,
+        borderWidth: 1,
+        marginTop: 5
+    },
+    dropdownItem: {
+        padding: 15,
+        height: 50,
+        justifyContent: 'center',
+        backdropFilter: 'blur(10px)'
+    },
+    dropdownItemText: {
+        // fontSize: 16
+    }
 })

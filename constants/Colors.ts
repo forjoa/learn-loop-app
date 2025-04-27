@@ -14,7 +14,8 @@ const primaryBlueLightBorder = '#4090FF'
 
 // Error colors
 const errorRed = '#FF4D4F'
-const errorRedLight = '#FF7875'
+const errorRedLight = '#FF4D4F'
+const errorRedBorder = '#FF7875'
 
 // Background colors
 const darkBackground = '#1F1F21'
@@ -73,6 +74,7 @@ export const Colors = {
     primary: primaryBlueLight,
     primaryBorder: primaryBlueLightBorder,
     error: errorRedLight,
+    errorBorder: errorRedBorder,
     disabledButton: disabledButtonLight,
     backdrop: backdropLight,
     line: lineLight,
@@ -109,6 +111,7 @@ export const Colors = {
     primary: primaryBlue,
     primaryBorder: primaryBlueBorder,
     error: errorRed,
+    errorBorder: errorRedBorder,
     disabledButton: disabledButtonDark,
     backdrop: backdropDark,
     line: lineDark,

@@ -3,15 +3,31 @@ import * as SecureStore from 'expo-secure-store'
 import { API_URL } from '@/constants/config'
 
 export function useAuth() {
-    const [user, setUser] = useState({})
-    const [loading, setLoading] = useState(false)
+    const [user, setUser] = useState<User | null>(null)
+    const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         const loadUser = async () => {
-            const token = await SecureStore.getItemAsync('authToken')
-            if (token) {
-                setUser({token})
+            try {
+                const token = await SecureStore.getItemAsync('authToken')
+                if (!token) {
+                    setLoading(false)
+                    return
+                }
+
+                const authUser = await SecureStore.getItemAsync('authUser')
+                if (!authUser) {
+                    setLoading(false)
+                    return
+                } else {
+                    setUser(JSON.parse(authUser))
+                }
+            } catch (err) {
+                await SecureStore.deleteItemAsync('authToken')
+                setUser(null)
+            } finally {
+                setLoading(false)
             }
         }
 
@@ -21,13 +37,9 @@ export function useAuth() {
     const login = async (email: string, password: string) => {
         try {
             setLoading(true)
-            setError(null)
-
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({email, password}),
             })
 
@@ -37,18 +49,13 @@ export function useAuth() {
             }
 
             const data = await response.json()
-            const token = data.token
+            await SecureStore.setItemAsync('authToken', data.token)
+            await SecureStore.setItemAsync('authUser', JSON.stringify(data.user))
+            setUser(data.user)
 
-            if (!token) {
-                throw new Error('No token received from server')
-            }
-
-            await SecureStore.setItemAsync('authToken', token)
-            setUser({token})
             return {success: true}
         } catch (err) {
-            console.error(err)
-            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred'
+            const errorMessage = err instanceof Error ? err.message : 'Error desconocido'
             setError(errorMessage)
             return {success: false, error: errorMessage}
         } finally {
@@ -88,7 +95,7 @@ export function useAuth() {
 
     const logout = async () => {
         await SecureStore.deleteItemAsync('authToken')
-        setUser({})
+        setUser(null)
     }
 
     return {user, login, register, logout, loading, error}
