@@ -56,10 +56,40 @@ export function useAuth() {
         }
     }
 
+    const register = async (name: string, email: string, password: string, role: string, photo: string) => {
+        try {
+            setLoading(true)
+            setError(null)
+
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({name, email, password, role, photo}),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.message || 'Registration failed')
+            }
+
+            const data = await response.json()
+            return {success: true}
+        } catch (err) {
+            console.error(err)
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred'
+            setError(errorMessage)
+            return {success: false, error: errorMessage}
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const logout = async () => {
         await SecureStore.deleteItemAsync('authToken')
         setUser({})
     }
 
-    return {user, login, logout, loading, error}
+    return {user, login, register, logout, loading, error}
 }
