@@ -9,8 +9,8 @@ const tintColorDark = '#fff'
 // Primary colors
 const primaryBlue = '#016BFF'
 const primaryBlueBorder = '#4090FF'
-const primaryBlueLight = '#0a7ea4'
-const primaryBlueLightBorder = '#0a9ec4'
+const primaryBlueLight = '#016BFF'
+const primaryBlueLightBorder = '#4090FF'
 
 // Error colors
 const errorRed = '#FF4D4F'

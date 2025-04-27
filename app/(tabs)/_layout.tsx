@@ -40,7 +40,6 @@ export default function TabLayout() {
                         { 
                             backgroundColor: Colors[colorScheme].nav.background,
                             borderColor: Colors[colorScheme].nav.border,
-                            color: Colors[colorScheme].tabIconDefault
                         }
                     ],
                 }}
@@ -122,7 +121,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
         position: 'absolute',
-        marginBottom: 24
+        marginBottom: 24,
     },
     newButton: {
         width: 60,

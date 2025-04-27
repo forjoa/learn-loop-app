@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import {
-  ImageSourcePropType,
   Image,
   StyleSheet,
   Text,
@@ -8,7 +7,6 @@ import {
   Pressable,
   ScrollView,
   TextInput,
-  ImageURISource,
   useColorScheme,
 } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
@@ -16,52 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Href, router } from 'expo-router'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import { Colors } from '@/constants/Colors'
-
-const profileImages: Record<string, ImageSourcePropType> = {
-  'ant.png': require('@/assets/images/profile/ant.png'),
-  'bear.png': require('@/assets/images/profile/bear.png'),
-  'bison.png': require('@/assets/images/profile/bison.png'),
-  'buffalo.png': require('@/assets/images/profile/buffalo.png'),
-  'cat-2.png': require('@/assets/images/profile/cat-2.png'),
-  'cat-3.png': require('@/assets/images/profile/cat-3.png'),
-  'chicken.png': require('@/assets/images/profile/chicken.png'),
-  'cow.png': require('@/assets/images/profile/cow.png'),
-  'crocodile.png': require('@/assets/images/profile/crocodile.png'),
-  'dog-2.png': require('@/assets/images/profile/dog-2.png'),
-  'dog-4.png': require('@/assets/images/profile/dog-4.png'),
-  'doraemon.png': require('@/assets/images/profile/doraemon.png'),
-  'duck.png': require('@/assets/images/profile/duck.png'),
-  'eagle.png': require('@/assets/images/profile/eagle.png'),
-  'elephant.png': require('@/assets/images/profile/elephant.png'),
-  'fox.png': require('@/assets/images/profile/fox.png'),
-  'giraffe.png': require('@/assets/images/profile/giraffe.png'),
-  'gorilla.png': require('@/assets/images/profile/gorilla.png'),
-  'hedgehog.png': require('@/assets/images/profile/hedgehog.png'),
-  'hello-kitty.png': require('@/assets/images/profile/hello-kitty.png'),
-  'hippo.png': require('@/assets/images/profile/hippo.png'),
-  'horse.png': require('@/assets/images/profile/horse.png'),
-  'keroppi.png': require('@/assets/images/profile/keroppi.png'),
-  'koala.png': require('@/assets/images/profile/koala.png'),
-  'leopard.png': require('@/assets/images/profile/leopard.png'),
-  'lion.png': require('@/assets/images/profile/lion.png'),
-  'monkey.png': require('@/assets/images/profile/monkey.png'),
-  'moose.png': require('@/assets/images/profile/moose.png'),
-  'mouse.png': require('@/assets/images/profile/mouse.png'),
-  'otter.png': require('@/assets/images/profile/otter.png'),
-  'owl.png': require('@/assets/images/profile/owl.png'),
-  'panda.png': require('@/assets/images/profile/panda.png'),
-  'penguin.png': require('@/assets/images/profile/penguin.png'),
-  'pig.png': require('@/assets/images/profile/pig.png'),
-  'pikachu.png': require('@/assets/images/profile/pikachu.png'),
-  'raccoon.png': require('@/assets/images/profile/raccoon.png'),
-  'sheep.png': require('@/assets/images/profile/sheep.png'),
-  'sloth.png': require('@/assets/images/profile/sloth.png'),
-  'snake.png': require('@/assets/images/profile/snake.png'),
-  'squirrel.png': require('@/assets/images/profile/squirrel.png'),
-  'tiger.png': require('@/assets/images/profile/tiger.png'),
-  'wolf.png': require('@/assets/images/profile/wolf.png'),
-  'zebra.png': require('@/assets/images/profile/zebra.png'),
-}
+import { profileImages } from '@/assets/profile-images'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -96,7 +49,7 @@ export default function Register() {
           <View style={styles.imageContainer}>
             <Image
               style={styles.image}
-              source={require('@/assets/images/droid.png')}
+              source={profileImage! ?? require('@/assets/images/droid.png')}
             />
           </View>
           <Text style={[
@@ -193,10 +146,10 @@ export default function Register() {
             {Object.keys(profileImages).map((image) => (
               <Pressable
                 key={image}
-                onPress={() => setProfileImage(image as ImageURISource)}
+                onPress={() => setProfileImage(profileImages[image])}
                 style={[
                   styles.profileOption,
-                  profileImage === image && [
+                  profileImage === profileImages[image] && [
                     styles.profileSelected,
                     { borderColor: Colors[colorScheme].primary }
                   ],
