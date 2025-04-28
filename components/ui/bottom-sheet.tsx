@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import {
     StyleSheet,
-    Text,
     View,
     TouchableWithoutFeedback,
     Dimensions,
@@ -121,14 +120,7 @@ export default function BottomSheet({
                         ]}
                     />
                     <SafeAreaView style={styles.content}>
-                        <Text
-                            style={[
-                                styles.title,
-                                {color: Colors[theme].text}
-                            ]}
-                        >
-                            {children}
-                        </Text>
+                        {children}
                     </SafeAreaView>
                 </Animated.View>
             </GestureDetector>
@@ -164,10 +156,5 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
     },
 })

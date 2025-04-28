@@ -16,12 +16,15 @@ export function useAuth() {
                     return
                 }
 
-                const authUser = await SecureStore.getItemAsync('authUser')
-                if (!authUser) {
+                const response = await fetch(`${API_URL}/auth/me/${token}`)
+                const data = await response.json()
+
+                if (!data['data']) {
                     setLoading(false)
                     return
                 } else {
-                    setUser(JSON.parse(authUser))
+                    const user: User = data['data']['user']
+                    setUser(user)
                 }
             } catch (err) {
                 await SecureStore.deleteItemAsync('authToken')
