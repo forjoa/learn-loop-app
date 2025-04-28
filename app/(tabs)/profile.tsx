@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native'
-import Main from '@/components/ui/Main'
+import Main from '@/components/ui/main'
 import { Colors } from '@/constants/Colors'
 import { useAuth } from '@/hooks/useAuth'
 import { profileImages } from '@/assets/profile-images'

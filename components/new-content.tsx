@@ -4,7 +4,7 @@ import {
     ColorSchemeName,
 } from 'react-native'
 import { Colors } from '@/constants/Colors'
-import BottomSheet from '@/components/ui/BottomSheet'
+import BottomSheet from '@/components/ui/bottom-sheet'
 
 type NewBottomSheetProps = {
     isVisible: boolean
@@ -12,7 +12,7 @@ type NewBottomSheetProps = {
     colorScheme?: ColorSchemeName
 }
 
-export default function NewBottomSheet({
+export default function NewContent({
                                            isVisible,
                                            onClose,
                                            colorScheme = 'dark',

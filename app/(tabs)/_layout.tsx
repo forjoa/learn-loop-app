@@ -4,7 +4,7 @@ import { Image, StyleSheet, Text, View, useColorScheme } from 'react-native'
 import Feather from '@expo/vector-icons/Feather'
 
 import { Colors } from '@/constants/Colors'
-import NewBottomSheet from '@/components/NewBottomSheet'
+import NewContent from '@/components/new-content'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function TabLayout() {
@@ -103,7 +103,7 @@ export default function TabLayout() {
                 />
             </Tabs>
 
-            <NewBottomSheet
+            <NewContent
                 isVisible={isNewBottomSheetVisible}
                 onClose={() => setIsNewBottomSheetVisible(false)}
                 colorScheme={colorScheme}
