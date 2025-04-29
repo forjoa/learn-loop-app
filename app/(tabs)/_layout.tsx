@@ -5,7 +5,7 @@ import Feather from '@expo/vector-icons/Feather'
 
 import { Colors } from '@/constants/Colors'
 import NewContent from '@/components/new-content'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Constants from 'expo-constants/src/Constants'
 
 export default function TabLayout() {
     const [isNewBottomSheetVisible, setIsNewBottomSheetVisible] = useState(false)
@@ -18,11 +18,11 @@ export default function TabLayout() {
                     tabBarActiveTintColor: Colors[colorScheme].tint,
                     headerShown: true,
                     header: () => (
-                        <SafeAreaView style={[
-                            styles.header, 
-                            { 
+                        <View style={[
+                            styles.header,
+                            {
                                 backgroundColor: Colors[colorScheme].header.background,
-                                borderColor: Colors[colorScheme].header.border 
+                                borderColor: Colors[colorScheme].header.border
                             }
                         ]}>
                             <Image
@@ -30,14 +30,14 @@ export default function TabLayout() {
                                 source={require('@/assets/images/droid.png')}
                             />
                             <Text style={[
-                                styles.headerTitle, 
-                                { color: Colors[colorScheme].header.text }
+                                styles.headerTitle,
+                                {color: Colors[colorScheme].header.text}
                             ]}>Learn Loop</Text>
-                        </SafeAreaView>
+                        </View>
                     ),
                     tabBarStyle: [
-                        styles.nav, 
-                        { 
+                        styles.nav,
+                        {
                             backgroundColor: Colors[colorScheme].nav.background,
                             borderColor: Colors[colorScheme].nav.border,
                         }
@@ -74,13 +74,13 @@ export default function TabLayout() {
                         title: '',
                         tabBarIcon: () => (
                             <View style={[
-                                styles.newButton, 
-                                { 
+                                styles.newButton,
+                                {
                                     backgroundColor: Colors[colorScheme].newButton.background,
-                                    borderColor: Colors[colorScheme].newButton.border 
+                                    borderColor: Colors[colorScheme].newButton.border
                                 }
                             ]}>
-                                <Feather name="plus" size={30} color='#fff'/>
+                                <Feather name="plus" size={30} color="#fff"/>
                             </View>
                         ),
                     }}
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 30,
         alignItems: 'center',
         overflow: 'hidden',
-        paddingLeft: 20,
-        paddingBottom: -15
+        paddingTop: Constants.statusBarHeight,
+        padding: 20,
     },
     headerTitle: {
         fontSize: 18,
