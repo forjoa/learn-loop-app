@@ -13,3 +13,12 @@ interface Topic {
     description: string
     ownerId: number
 }
+
+interface Noti {
+    id: number
+    userId: number
+    title: string
+    content: string
+    createdAt?: string
+    updatedAt?: string
+}

@@ -12,6 +12,8 @@ const primaryBlueBorder = '#4090FF'
 const primaryBlueLight = '#016BFF'
 const primaryBlueLightBorder = '#4090FF'
 
+const primaryBlueBackground = 'rgba(1,107,255,0.2)'
+
 // Error colors
 const errorRed = '#FF4D4F'
 const errorRedLight = '#FF4D4F'
@@ -52,7 +54,7 @@ const lineDark = 'grey'
 const lineLight = '#AEAEB2'
 
 // Navigation colors
-const navBackgroundDark = '#1F1F21'
+const navBackgroundDark = '#27272a'
 const navBackgroundLight = '#F5F5F7'
 const navBorderDark = '#353638'
 const navBorderLight = '#D1D1D6'
@@ -64,6 +66,7 @@ export const Colors = {
     text: lightText,
     textSecondary: lightTextSecondary,
     background: lightBackground,
+    primaryBackground: primaryBlueBackground,
     tint: primaryBlueLight,
     icon: '#687076',
     tabIconDefault: tabIconDefaultLight,
@@ -101,6 +104,7 @@ export const Colors = {
     text: darkText,
     textSecondary: darkTextSecondary,
     background: darkBackground,
+    primaryBackground: primaryBlueBackground,
     tint: tintColorDark,
     icon: '#9BA1A6',
     tabIconDefault: tabIconDefaultDark,
