@@ -6,3 +6,10 @@ interface User {
     photo: string
     role: string
 }
+
+interface Topic {
+    id: number
+    title: string
+    description: string
+    ownerId: number
+}
