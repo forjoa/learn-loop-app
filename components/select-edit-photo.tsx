@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         flex: 1,
-        maxHeight: 500,
+        height: '100%',
     },
     grid: {
         flexDirection: 'row',
