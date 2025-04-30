@@ -114,7 +114,8 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
     nav: {
-        paddingTop: 8,
+        height: 85,
+        paddingTop: 7,
         borderTopWidth: 2,
         borderLeftWidth: 0.5,
         borderRightWidth: 0.5,
