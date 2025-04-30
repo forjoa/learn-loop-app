@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native'
 
 import Main from '@/components/ui/main'
 import { useEffect, useState } from 'react'
@@ -39,7 +39,7 @@ export default function NotificationScreen() {
                 <Text style={[{color: Colors[theme].text}]}>No hay notificaciones</Text>
             ) : (
                 notifications.map((notif, index) => (
-                    <Pressable key={index} style={[styles.nav, {borderColor: Colors[theme].nav.border, backgroundColor: Colors[theme].header.background}]}>
+                    <TouchableOpacity key={index} style={[styles.nav, {borderColor: Colors[theme].nav.border, backgroundColor: Colors[theme].header.background}]}>
                         <View style={[styles.imageContainer, {backgroundColor: Colors[theme].primaryBackground}]}>
                             <Feather name={notif.title.toLowerCase().includes('solicitud') ? 'users' : 'file-plus'} color={Colors[theme].primary} size={30}/>
                         </View>
@@ -51,7 +51,7 @@ export default function NotificationScreen() {
                                 {new Date(notif.createdAt!).getDay()}/{new Date(notif.createdAt!).getMonth() + 1} - {new Date(notif.createdAt!).getHours()}:{new Date(notif.createdAt!).getMinutes()}
                             </Text>
                         </View>
-                    </Pressable>
+                    </TouchableOpacity>
                 ))
             )}
         </Main>
