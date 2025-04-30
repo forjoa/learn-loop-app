@@ -1,4 +1,4 @@
-import { StyleSheet, Text, useColorScheme, View } from 'react-native'
+import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native'
 
 import Main from '@/components/ui/main'
 import { useEffect, useState } from 'react'
@@ -39,9 +39,9 @@ export default function NotificationScreen() {
                 <Text style={[{color: Colors[theme].text}]}>No hay notificaciones</Text>
             ) : (
                 notifications.map((notif, index) => (
-                    <View key={index} style={[styles.nav, {borderColor: Colors[theme].nav.border, backgroundColor: Colors[theme].header.background}]}>
+                    <Pressable key={index} style={[styles.nav, {borderColor: Colors[theme].nav.border, backgroundColor: Colors[theme].header.background}]}>
                         <View style={[styles.imageContainer, {backgroundColor: Colors[theme].primaryBackground}]}>
-                            <Feather name="users" color={Colors[theme].primary} size={30}/>
+                            <Feather name={notif.title.toLowerCase().includes('solicitud') ? 'users' : 'file-plus'} color={Colors[theme].primary} size={30}/>
                         </View>
                         <View style={[styles.textContainer]}>
                             <Text style={[{color: Colors[theme].text}]}>
@@ -51,7 +51,7 @@ export default function NotificationScreen() {
                                 {new Date(notif.createdAt!).getDay()}/{new Date(notif.createdAt!).getMonth() + 1} - {new Date(notif.createdAt!).getHours()}:{new Date(notif.createdAt!).getMinutes()}
                             </Text>
                         </View>
-                    </View>
+                    </Pressable>
                 ))
             )}
         </Main>
