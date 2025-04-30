@@ -123,15 +123,21 @@ export default function NewContent({
 
         try {
             setLoading(true)
-            // TODO: use API
-            /*
-            await axios.post('/posts', {
-                title,
-                content,
-                authorId: user?.id,
-                topicId: selectedTopicId
-            })
-            */
+
+            await fetch(`${API_URL}/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        content,
+                        userId: user?.id,
+                        topicId: selectedTopicId
+                    })
+                }
+            )
             Alert.alert('Éxito', 'Post creado correctamente')
             resetForm()
             onClose()
