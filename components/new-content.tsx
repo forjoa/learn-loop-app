@@ -353,6 +353,18 @@ export default function NewContent({
                     Nuevo Post
                 </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+                style={[
+                    styles.tab,
+                    formType === 'enrollment' && {borderBottomColor: Colors[theme].primary, borderBottomWidth: 2}
+                ]}
+                onPress={() => setFormType('enrollment')}
+            >
+                <Text
+                    style={[styles.tabText, {color: formType === 'enrollment' ? Colors[theme].primary : Colors[theme].text}]}>
+                    Ingresar a un tema
+                </Text>
+            </TouchableOpacity>
         </View>
     )
 
@@ -371,7 +383,7 @@ export default function NewContent({
                 {isTeacher ? (
                     <>
                         {renderTeacherTabs()}
-                        {formType === 'topic' ? renderTopicForm() : renderPostForm()}
+                        {formType === 'topic' ? renderTopicForm() : formType === 'post' ? renderPostForm() : renderEnrollmentForm()}
                     </>
                 ) : (
                     renderEnrollmentForm()
