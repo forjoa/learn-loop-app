@@ -1,4 +1,4 @@
-interface User {
+export interface User {
     id: number
     name: string
     email: string
@@ -7,18 +7,33 @@ interface User {
     role: string
 }
 
-interface Topic {
+export interface Topic {
     id: number
     title: string
     description: string
     ownerId: number
 }
 
-interface Noti {
+export interface Noti {
     id: number
     userId: number
     title: string
     content: string
     createdAt?: string
     updatedAt?: string
+}
+
+export interface TopicWithUsers extends Topic {
+    users: UserInTopic[]
+    owner: Owner
+}
+
+export interface UserInTopic {
+    status: string
+    userId: number
+}
+
+export interface Owner {
+    id: number
+    name: string
 }
