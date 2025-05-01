@@ -47,7 +47,7 @@ export default function Login() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={[
           styles.container,
-          { backgroundColor: Colors[colorScheme].card }
+          { backgroundColor: Colors[colorScheme].nav.background }
         ]}
       >
         <View style={styles.imageContainer}>

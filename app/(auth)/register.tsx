@@ -69,7 +69,7 @@ export default function Register() {
                 <ScrollView
                     style={[
                         styles.container,
-                        {backgroundColor: Colors[colorScheme].card}
+                        {backgroundColor: Colors[colorScheme].nav.background}
                     ]}
                     contentContainerStyle={{flexGrow: 1}}
                     showsVerticalScrollIndicator={false}
