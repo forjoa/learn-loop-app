@@ -1,14 +1,13 @@
 import { useMemo } from 'react'
 import { Text, StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native'
+import { RelativePathString, router } from 'expo-router'
 import { TopicWithUsers } from '@/lib/interfaces'
 
 const {width} = Dimensions.get('window')
 
 const getRandomHex = (): string => {
     const rand = () =>
-        Math.floor(Math.random() * 256)
-            .toString(16)
-            .padStart(2, '0')
+        Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
     return `#${rand()}${rand()}${rand()}`
 }
 
@@ -32,7 +31,10 @@ export default function TopicCard({topic, isMine, textColor}: TopicCardProps) {
     const borderColor = hex
 
     return (
-        <TouchableOpacity style={[styles.card, {backgroundColor: bgColor, borderColor}]}>
+        <TouchableOpacity
+            style={[styles.card, {backgroundColor: bgColor, borderColor}]}
+            onPress={() => router.push(`/topics/${topic.id}` as RelativePathString)}
+        >
             <Text style={[styles.owner, {color: textColor, backgroundColor: hex}]}>
                 {isMine ? 'Mi tema' : topic.owner.name}
             </Text>
@@ -57,9 +59,6 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         alignSelf: 'center',
         borderWidth: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
         position: 'relative',
     },
     owner: {
@@ -72,6 +71,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         borderRadius: 8,
     },
+    textContainer: {
+        position: 'absolute',
+        bottom: 12,
+        left: 16,
+    },
     title: {
         fontSize: 20,
         fontWeight: '700',
@@ -80,10 +84,5 @@ const styles = StyleSheet.create({
     desc: {
         fontSize: 14,
         lineHeight: 20,
-    },
-    textContainer: {
-        position: 'absolute',
-        bottom: 12,
-        left: 16,
     },
 })

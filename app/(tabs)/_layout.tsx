@@ -47,6 +47,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="index"
                     options={{
+                        animation: 'shift',
                         title: 'Inicio',
                         tabBarIcon: ({focused}) => <Feather name="home" size={24}
                                                             color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
@@ -55,6 +56,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="chats"
                     options={{
+                        animation: 'shift',
                         title: 'Chats',
                         tabBarIcon: ({focused}) => (
                             <Feather name="message-circle" size={24}
@@ -71,6 +73,7 @@ export default function TabLayout() {
                         },
                     }}
                     options={{
+                        animation: 'shift',
                         title: '',
                         tabBarIcon: () => (
                             <View style={[
@@ -88,6 +91,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="notifications"
                     options={{
+                        animation: 'shift',
                         title: 'Notificaciones',
                         tabBarIcon: ({focused}) => <Feather name="bell" size={24}
                                                             color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
@@ -96,9 +100,24 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="profile"
                     options={{
+                        animation: 'shift',
                         title: 'Perfil',
                         tabBarIcon: ({focused}) => <Feather name="user" size={24}
                                                             color={focused ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].tabIconDefault}/>,
+                    }}
+                />
+
+                <Tabs.Screen
+                    name="topics/[id]"
+                    options={{
+                        href: null,
+                        animation: 'shift',
+                        transitionSpec: {
+                            animation: 'timing',
+                            config: {
+                                duration: 300,
+                            },
+                        },
                     }}
                 />
             </Tabs>
