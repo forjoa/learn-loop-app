@@ -17,6 +17,7 @@ import * as SecureStore from 'expo-secure-store'
 import { API_URL } from '@/constants/config'
 import { MaterialIcons } from '@expo/vector-icons'
 import SelectDropdown from 'react-native-select-dropdown'
+import { Topic } from '@/lib/interfaces'
 
 type NewBottomSheetProps = {
     isVisible: boolean
@@ -408,7 +409,7 @@ export default function NewContent({
                             {isTeacher
                                 ? formType === 'topic'
                                     ? 'Crear Tema'
-                                    : 'Crear Post'
+                                    : formType === 'enrollment' ? 'Solicitar' : 'Crear Post'
                                 : 'Enviar Solicitud'}
                         </Text>
                     )}
