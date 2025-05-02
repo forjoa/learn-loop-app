@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as SecureStore from 'expo-secure-store'
 import { API_URL } from '@/constants/config'
+import { User } from '@/lib/interfaces'
 
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null)
