@@ -8,6 +8,7 @@ import * as SecureStorage from 'expo-secure-store'
 import { Colors } from '@/constants/Colors'
 import Feather from '@expo/vector-icons/Feather'
 import CustomAlert from '@/components/ui/dialog'
+import { Noti } from '@/lib/interfaces'
 
 export default function NotificationScreen() {
     const [notifications, setNotifications] = useState<Noti[]>([])

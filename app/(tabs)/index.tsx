@@ -42,7 +42,7 @@ export default function HomeScreen() {
                     <View key={topic.id}>
                         <TopicCard
                             topic={topic}
-                            isMine={topic.ownerId === user.id}
+                            isMine={topic.ownerId === user?.id}
                             textColor={'#fff'}
                         />
                     </View>
