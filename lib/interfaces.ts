@@ -37,3 +37,17 @@ export interface Owner {
     id: number
     name: string
 }
+
+export interface Post {
+    id: number
+    title: string
+    content: string
+    userId: number
+    topicId: number
+}
+
+export interface DetailedTopic extends Topic {
+    users: User[]
+    owner: Owner
+    posts: Post[]
+}
