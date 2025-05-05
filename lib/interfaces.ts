@@ -52,3 +52,18 @@ export interface DetailedTopic extends Topic {
     owner: Owner
     posts: Post[]
 }
+
+export interface File {
+    userId: number
+    id: number
+    createdAt: Date
+    updatedAt: Date
+    url: string
+    filename: string
+    fileType: string
+    postId: number
+}
+
+export interface DetailedPost extends Post {
+    files: File[]
+}

@@ -8,11 +8,14 @@ import * as SecureStore from 'expo-secure-store'
 import { DetailedTopic } from '@/lib/interfaces'
 import { profileImages } from '@/assets/profile-images'
 import Feather from '@expo/vector-icons/Feather'
+import Post from '@/components/post'
 
 const {width} = Dimensions.get('window')
 
 export default function TopicDetails() {
     const [topic, setTopic] = useState<DetailedTopic>()
+    const [postIsVisible, setPostIsVisible] = useState(false)
+    const [selectedPostId, setSelectedPostId] = useState<number>()
     const {id} = useLocalSearchParams()
     const theme = useColorScheme() || 'dark'
 
@@ -35,74 +38,84 @@ export default function TopicDetails() {
     }, [id])
 
     return (
-        <Main>
-            <View>
-                <TouchableOpacity style={styles.backContainer} onPress={() => router.push(`/` as RelativePathString)}>
-                    <Feather name="arrow-left" style={[{color: Colors[theme].text}]} size={14}/>
-                    <Text style={[{color: Colors[theme].text}]}>
-                        Volver
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            {topic ? (
-                <View style={[styles.container]}>
-                    <Text style={[styles.title, {color: Colors[theme].text}]}>{topic?.title}</Text>
-                    <Text style={[{color: Colors[theme].text}]}>{topic?.description}</Text>
-                    <View style={[
-                        styles.hr,
-                        {backgroundColor: Colors[theme].border}
-                    ]}/>
-                    <Text style={[{color: Colors[theme].textSecondary}]}>Miembros</Text>
-                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}
-                                style={[styles.profilesContainer]}>
-                        {topic.users.map((user, index) => {
-                            return (
-                                <View key={index} style={[styles.profileImageContainer, {
-                                    backgroundColor: Colors[theme].primaryBackground,
-                                    borderColor: Colors[theme].primaryBorder
-                                }]}>
-                                    <Image
-                                        source={profileImages[user.photo]}
-                                        style={styles.profileImage}
-                                    />
-                                </View>
-                            )
-                        })}
-                    </ScrollView>
-                    <View style={[
-                        styles.hr,
-                        {backgroundColor: Colors[theme].border}
-                    ]}/>
-                    <Text style={[{color: Colors[theme].textSecondary}]}>Contenido</Text>
-                    <ScrollView showsVerticalScrollIndicator={false}
-                                style={[styles.postsContainer]}>
-                        {topic.posts.map((post, index) => {
-                            return (
-                                <TouchableOpacity key={index} style={[
-                                    styles.postContainer, {
-                                        backgroundColor: Colors[theme].nav.background,
-                                        borderColor: Colors[theme].nav.border,
-                                    }]}>
-                                    <View style={[styles.postIconContainer]}>
-                                        <Feather name="book-open" color={'#fff'} size={24}/>
-                                    </View>
-                                    <View style={[styles.postContentContainer]}>
-                                        <Text
-                                            style={[styles.postTitle, {color: Colors[theme].text}]}>{post.title}</Text>
-                                        <Text
-                                            style={[{color: Colors[theme].textSecondary}]}>
-                                            {new Date(post.createdAt!).getDay()}/{new Date(post.createdAt!).getMonth() + 1} - {new Date(post.createdAt!).getHours()}:{new Date(post.createdAt!).getMinutes()}
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </ScrollView>
+        <>
+            <Main>
+                <View>
+                    <TouchableOpacity style={styles.backContainer}
+                                      onPress={() => router.push(`/` as RelativePathString)}>
+                        <Feather name="arrow-left" style={[{color: Colors[theme].text}]} size={14}/>
+                        <Text style={[{color: Colors[theme].text}]}>
+                            Volver
+                        </Text>
+                    </TouchableOpacity>
                 </View>
-            ) : (
-                <Text style={[{color: Colors[theme].text}]}>No hay tema con este ID</Text>
-            )}
-        </Main>
+                {topic ? (
+                    <View style={[styles.container]}>
+                        <Text style={[styles.title, {color: Colors[theme].text}]}>{topic?.title}</Text>
+                        <Text style={[{color: Colors[theme].text}]}>{topic?.description}</Text>
+                        <View style={[
+                            styles.hr,
+                            {backgroundColor: Colors[theme].border}
+                        ]}/>
+                        <Text style={[{color: Colors[theme].textSecondary}]}>Miembros</Text>
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}
+                                    style={[styles.profilesContainer]}>
+                            {topic.users.map((user, index) => {
+                                return (
+                                    <View key={index} style={[styles.profileImageContainer, {
+                                        backgroundColor: Colors[theme].primaryBackground,
+                                        borderColor: Colors[theme].primaryBorder
+                                    }]}>
+                                        <Image
+                                            source={profileImages[user.photo]}
+                                            style={styles.profileImage}
+                                        />
+                                    </View>
+                                )
+                            })}
+                        </ScrollView>
+                        <View style={[
+                            styles.hr,
+                            {backgroundColor: Colors[theme].border}
+                        ]}/>
+                        <Text style={[{color: Colors[theme].textSecondary}]}>Contenido</Text>
+                        <ScrollView showsVerticalScrollIndicator={false}
+                                    style={[styles.postsContainer]}>
+                            {topic.posts.map((post, index) => {
+                                return (
+                                    <TouchableOpacity key={index} style={[
+                                        styles.postContainer, {
+                                            backgroundColor: Colors[theme].nav.background,
+                                            borderColor: Colors[theme].nav.border,
+                                        }]}
+                                                      onPress={() => {
+                                                          setSelectedPostId(post.id)
+                                                          setPostIsVisible(true)
+                                                      }}
+                                    >
+                                        <View style={[styles.postIconContainer]}>
+                                            <Feather name="book-open" color={'#fff'} size={24}/>
+                                        </View>
+                                        <View style={[styles.postContentContainer]}>
+                                            <Text
+                                                style={[styles.postTitle, {color: Colors[theme].text}]}>{post.title}</Text>
+                                            <Text
+                                                style={[{color: Colors[theme].textSecondary}]}>
+                                                {new Date(post.createdAt!).getDay()}/{new Date(post.createdAt!).getMonth() + 1} - {new Date(post.createdAt!).getHours()}:{new Date(post.createdAt!).getMinutes()}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </ScrollView>
+                    </View>
+                ) : (
+                    <Text style={[{color: Colors[theme].text}]}>No hay tema con este ID</Text>
+                )}
+            </Main>
+
+            <Post isVisible={postIsVisible} onClose={() => setPostIsVisible(false)} colorScheme={theme} currentPostId={selectedPostId!}/>
+        </>
     )
 }
 
@@ -149,7 +162,7 @@ const styles = StyleSheet.create({
         width: width * 0.9,
         padding: 10,
         borderRadius: 10,
-        borderTopWidth: 1,
+        borderTopWidth: 1.5,
         borderLeftWidth: 0.5,
         borderRightWidth: 0.5,
         display: 'flex',
