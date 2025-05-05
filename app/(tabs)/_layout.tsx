@@ -5,7 +5,7 @@ import Feather from '@expo/vector-icons/Feather'
 
 import { Colors } from '@/constants/Colors'
 import NewContent from '@/components/new-content'
-import Constants from 'expo-constants/src/Constants'
+import Constants from 'expo-constants'
 
 export default function TabLayout() {
     const [isNewBottomSheetVisible, setIsNewBottomSheetVisible] = useState(false)

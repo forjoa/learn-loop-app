@@ -44,6 +44,7 @@ export interface Post {
     content: string
     userId: number
     topicId: number
+    createdAt: string
 }
 
 export interface DetailedTopic extends Topic {
