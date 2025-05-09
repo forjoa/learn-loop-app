@@ -45,7 +45,7 @@ export default function NewContent({
     const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null)
     const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
     const [loadingTopics, setLoadingTopics] = useState(false)
-    const [selectedDocument, setSelectedDocument] = useState<DocumentPicker.DocumentPickerAsset>()
+    const [selectedDocument, setSelectedDocument] = useState<DocumentPicker.DocumentPickerAsset | null>(null)
 
     const isTeacher = user?.role === 'TEACHER'
 
@@ -215,6 +215,8 @@ export default function NewContent({
                     title={title}
                     content={content}
                     pickDocuments={pickDocuments}
+                    selectedDocument={selectedDocument!}
+                    setSelectedDocument={setSelectedDocument}
                 />
             )
         } else {

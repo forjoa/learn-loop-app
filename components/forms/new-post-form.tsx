@@ -16,6 +16,7 @@ import { Topic, User } from '@/lib/interfaces'
 import { env } from '@/lib/environment'
 import { API_URL } from '@/constants/config'
 import * as DocumentPicker from 'expo-document-picker'
+import SwipeToDeleteItem from '@/components/ui/swipe-delete-item'
 
 interface NewPostFormProps {
     loadingTopics: boolean
@@ -28,6 +29,8 @@ interface NewPostFormProps {
     title: string
     content: string
     pickDocuments: () => void
+    selectedDocument: DocumentPicker.DocumentPickerAsset
+    setSelectedDocument: (document: DocumentPicker.DocumentPickerAsset | null) => void
 }
 
 export default function NewPostForm({
@@ -40,9 +43,17 @@ export default function NewPostForm({
                                         setTitle,
                                         pickDocuments,
                                         content,
-                                        setContent
+                                        setContent,
+                                        selectedDocument,
+                                        setSelectedDocument
                                     }: NewPostFormProps) {
     const theme = useColorScheme() || 'dark'
+
+    const handleDelete = () => {
+        console.log('Documento a eliminar:', selectedDocument?.name)
+
+        setSelectedDocument(null) // Limpia el documento seleccionado
+    }
 
     return (
         <View style={styles.form}>
@@ -52,7 +63,6 @@ export default function NewPostForm({
                 <Text style={{color: Colors[theme].text}}>No hay temas disponibles</Text>
             ) : (
                 <>
-                    <Text style={[styles.label, {color: Colors[theme].text}]}>Selecciona un tema:</Text>
                     <View>
                         <SelectDropdown
                             data={topicsByOwner}
@@ -128,13 +138,33 @@ export default function NewPostForm({
                         multiline
                         numberOfLines={6}
                     />
-                    <TouchableOpacity style={[styles.selectFile, {
-                        backgroundColor: Colors[theme].input || 'transparent',
-                        borderColor: Colors[theme].border
-                    }]} onPress={pickDocuments}>
-                        <Text style={[{color: Colors[theme].text}]}>Seleccionar archivo</Text>
-                        <Feather name="file-plus" color={Colors[theme].text} size={16} stroke={1}/>
-                    </TouchableOpacity>
+                    {selectedDocument ? (
+                        <SwipeToDeleteItem onDelete={handleDelete}>
+                            <View style={[styles.fileContainer, {
+                                backgroundColor: Colors[theme].nav.background,
+                                borderColor: Colors[theme].nav.border
+                            }]}>
+                                <View style={[styles.typeContainer, {backgroundColor: Colors[theme].error}]}>
+                                    <Text style={[{color: '#fff'}]}>
+                                        {selectedDocument.name.split('.')[1]}
+                                    </Text>
+                                </View>
+                                <View>
+                                    <Text style={[{color: Colors[theme].text}]}>
+                                        {`${selectedDocument.name}`}
+                                    </Text>
+                                </View>
+                            </View>
+                        </SwipeToDeleteItem>
+                    ) : (
+                        <TouchableOpacity style={[styles.selectFile, {
+                            backgroundColor: Colors[theme].input || 'transparent',
+                            borderColor: Colors[theme].border
+                        }]} onPress={pickDocuments}>
+                            <Text style={[{color: Colors[theme].text}]}>Adjuntar archivo</Text>
+                            <Feather name="file-plus" color={Colors[theme].text} size={16} stroke={1}/>
+                        </TouchableOpacity>
+                    )}
                 </>
             )}
         </View>
@@ -181,18 +211,13 @@ export const createPost = async (title: string, content: string, selectedTopicId
         data.append('upload_preset', 'learn-loop')
         data.append('api_key', env.CLOUDINARY_KEY!)
 
-        try {
-            const response = await fetch(env.CLOUDINARY_ENDPOINT!, {
-                method: 'POST',
-                body: data,
-            })
+        const response = await fetch(env.CLOUDINARY_ENDPOINT!, {
+            method: 'POST',
+            body: data,
+        })
 
-            const result = await response.json()
-            console.log('Upload result:', result)
-            return result
-        } catch (error) {
-            console.error('Error uploading file:', error)
-        }
+        const result = await response.json()
+        console.log('Upload result:', result)
 
         await fetch(`${API_URL}/posts`, {
                 method: 'POST',
@@ -204,7 +229,10 @@ export const createPost = async (title: string, content: string, selectedTopicId
                     title,
                     content,
                     userId: user?.id,
-                    topicId: selectedTopicId
+                    topicId: selectedTopicId,
+                    fileUrl: result.secure_url,
+                    filename: selectedDocument.name.split('.')[0],
+                    fileType: selectedDocument.name.split('.')[1],
                 })
             }
         )
@@ -273,4 +301,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     dropdownItemText: {},
+    fileContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        padding: 15,
+        borderRadius: 15,
+        borderTopWidth: 1.5,
+        borderLeftWidth: 0.5,
+        borderRightWidth: 0.5,
+    },
+    typeContainer: {
+        paddingHorizontal: 7,
+        paddingVertical: 9,
+        borderRadius: 10,
+    }
 })
