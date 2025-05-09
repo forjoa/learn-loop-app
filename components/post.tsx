@@ -2,7 +2,7 @@ import {
     ColorSchemeName,
     ScrollView,
     StyleSheet,
-    Text,
+    Text, TouchableOpacity,
     View
 } from 'react-native'
 import BottomSheet from '@/components/ui/bottom-sheet'
@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { DetailedPost } from '@/lib/interfaces'
 import { API_URL } from '@/constants/config'
 import * as SecureStore from 'expo-secure-store'
+import * as WebBrowser from 'expo-web-browser'
 
 type PostProps = {
     isVisible: boolean
@@ -59,21 +60,57 @@ export default function Post({
         }
     }, [currentPostId, token])
 
+    const handlePressButtonAsync = async (url: string) => {
+        await WebBrowser.openBrowserAsync(url)
+    }
+
     return (
         <BottomSheet isVisible={isVisible} onClose={onClose} colorScheme={theme}>
-            <View style={styles.contentContainer}>
-                <Text style={[styles.title, {color: Colors[theme].text}]}>
-                    Resumen
-                </Text>
+            {post && (
+                <View style={styles.contentContainer}>
+                    <Text style={[styles.title, {color: Colors[theme].text}]}>
+                        {post.title}
+                    </Text>
 
-                <View style={styles.scrollContainer}>
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
-                    >
+                    <View style={styles.scrollContainer}>
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <Text style={[{color: Colors[theme].text}]}>{post.content}</Text>
 
-                    </ScrollView>
+                            <View style={[
+                                styles.hr,
+                                {backgroundColor: Colors[theme].border}
+                            ]}/>
+
+                            {post.file ? (
+                                <TouchableOpacity
+                                    style={[styles.fileContainer, {
+                                        backgroundColor: Colors[theme].nav.background,
+                                        borderColor: Colors[theme].nav.border
+                                    }]}
+                                    onPress={() => handlePressButtonAsync(post?.file.url)}>
+                                    <View style={[styles.typeContainer, {backgroundColor: Colors[theme].error}]}>
+                                        <Text style={[{color: '#fff'}]}>
+                                            {post.file.fileType}
+                                        </Text>
+                                    </View>
+                                    <View>
+                                        <Text style={[{color: Colors[theme].text}]}>
+                                            {`${post.file.filename}.${post.file.fileType}`}
+                                        </Text>
+                                        <Text style={[{color: Colors[theme].textSecondary}]}>
+                                            Publicado {new Date(post.file.createdAt!).getDay()}/{new Date(post.file.createdAt!).getMonth() + 1}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ) : (
+                                <Text style={[{color: Colors[theme].text}]}>No hay archivos disponibles</Text>
+                            )}
+                        </ScrollView>
+                    </View>
                 </View>
-            </View>
+            )}
         </BottomSheet>
     )
 }
@@ -91,5 +128,25 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flex: 1,
         height: '100%',
+    },
+    hr: {
+        height: 1,
+        marginVertical: 20,
+    },
+    fileContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        padding: 15,
+        borderRadius: 15,
+        borderTopWidth: 1.5,
+        borderLeftWidth: 0.5,
+        borderRightWidth: 0.5,
+    },
+    typeContainer: {
+        paddingHorizontal: 10,
+        paddingVertical: 13,
+        borderRadius: 10,
     }
 })

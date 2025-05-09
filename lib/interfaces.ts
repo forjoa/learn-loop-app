@@ -65,5 +65,5 @@ export interface File {
 }
 
 export interface DetailedPost extends Post {
-    files: File[]
+    file: File
 }
