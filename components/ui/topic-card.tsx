@@ -5,10 +5,31 @@ import { TopicWithUsers } from '@/lib/interfaces'
 
 const {width} = Dimensions.get('window')
 
-const getRandomHex = (): string => {
-    const rand = () =>
-        Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
-    return `#${rand()}${rand()}${rand()}`
+const generateDeterministicHexColor = (id: number): string => {
+    const positiveId = Math.abs(Math.floor(id === 0 ? 1 : id))
+
+    const p1 = 131
+    const p2 = 173
+    const p3 = 211
+
+    const xor1 = 0x5A5A5A
+    const xor2 = 0xA5A5A5
+    const xor3 = 0xCACACA
+
+    let r_val = (positiveId * p1) ^ xor1
+    let g_val = (positiveId * p2) ^ xor2
+    let b_val = (positiveId * p3) ^ xor3
+
+    const r = (r_val & 0xFF) % 156 + 80
+    const g = (g_val & 0xFF) % 156 + 80
+    const b = (b_val & 0xFF) % 156 + 80
+
+    const toHexComponent = (c: number): string => {
+        const hex = Math.max(0, Math.min(255, Math.floor(c))).toString(16)
+        return hex.length === 1 ? '0' + hex : hex
+    }
+
+    return `#${toHexComponent(r)}${toHexComponent(g)}${toHexComponent(b)}`
 }
 
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -26,7 +47,19 @@ interface TopicCardProps {
 }
 
 export default function TopicCard({topic, isMine, textColor}: TopicCardProps) {
-    const hex = useMemo(() => getRandomHex(), [topic.id])
+    const hex = useMemo(() => {
+        const numericId = Number(topic.id)
+
+        if (isNaN(numericId)) {
+            console.warn(`ID de tema inválido para generación de color: ${topic.id}`)
+
+            const rand = () =>
+                Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+            return `#${rand()}${rand()}${rand()}`
+        }
+        return generateDeterministicHexColor(numericId)
+    }, [topic.id])
+
     const bgColor = useMemo(() => hexToRgba(hex, 0.5), [hex])
     const borderColor = hex
 

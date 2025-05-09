@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         flex: 1,
+        marginBottom: 70
     },
     contentContainer: {
         flexGrow: 1,
