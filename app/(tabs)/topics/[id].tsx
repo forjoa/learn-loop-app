@@ -15,7 +15,7 @@ const {width} = Dimensions.get('window')
 export default function TopicDetails() {
     const [topic, setTopic] = useState<DetailedTopic>()
     const [postIsVisible, setPostIsVisible] = useState(false)
-    const [selectedPostId, setSelectedPostId] = useState<number>()
+    const [selectedPostId, setSelectedPostId] = useState<string>()
     const {id} = useLocalSearchParams()
     const theme = useColorScheme() || 'dark'
 

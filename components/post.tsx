@@ -17,7 +17,7 @@ type PostProps = {
     isVisible: boolean
     onClose: () => void
     colorScheme?: ColorSchemeName
-    currentPostId: number
+    currentPostId: string
 }
 
 export default function Post({
@@ -43,7 +43,7 @@ export default function Post({
         console.log(currentPostId)
         if (currentPostId) {
             const loadPost = async () => {
-                const result = await fetch(`${API_URL}/posts/?id=${Number(currentPostId)}`, {
+                const result = await fetch(`${API_URL}/posts/?id=${currentPostId}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

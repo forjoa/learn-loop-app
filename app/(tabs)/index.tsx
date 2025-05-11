@@ -33,7 +33,7 @@ export default function HomeScreen() {
         if (user) {
             loadTopics()
         }
-    }, [loadTopics, user])
+    }, [user])
 
     return (
         <Main onLoad={loadTopics}>

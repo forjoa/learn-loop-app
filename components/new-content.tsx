@@ -42,7 +42,7 @@ export default function NewContent({
     const [topicsByOwner, setTopicsByOwner] = useState<Topic[]>([])
     const [topicId, setTopicId] = useState('')
     const [token, setToken] = useState('')
-    const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null)
+    const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null)
     const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
     const [loadingTopics, setLoadingTopics] = useState(false)
     const [selectedDocument, setSelectedDocument] = useState<DocumentPicker.DocumentPickerAsset | null>(null)

@@ -23,7 +23,7 @@ interface NewPostFormProps {
     topicsByOwner: Topic[]
     selectedTopic: Topic | null
     setSelectedTopic: (topic: Topic) => void
-    setSelectedTopicId: (id: number) => void
+    setSelectedTopicId: (id: string) => void
     setTitle: (text: string) => void
     setContent: (text: string) => void
     title: string
@@ -186,7 +186,7 @@ function getMimeType(filename: string): string {
     }
 }
 
-export const createPost = async (title: string, content: string, selectedTopicId: number, setLoading: (loading: boolean) => void, selectedDocument: DocumentPicker.DocumentPickerAsset, token: string, resetForm: () => void, onClose: () => void, user: User) => {
+export const createPost = async (title: string, content: string, selectedTopicId: string, setLoading: (loading: boolean) => void, selectedDocument: DocumentPicker.DocumentPickerAsset, token: string, resetForm: () => void, onClose: () => void, user: User) => {
     if (!title || !content || !selectedTopicId) {
         Alert.alert('Error', 'Por favor completa todos los campos')
         return

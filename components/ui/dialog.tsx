@@ -64,20 +64,23 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                                 </Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={[
-                                    styles.button,
-                                    {
-                                        backgroundColor: currentColors.error,
-                                        borderWidth: 1,
-                                        borderColor: currentColors.errorBorder,
-                                    }
-                                ]}
-                                onPress={onDeny}
-                            >
-                                <Text style={[styles.buttonText, {
-                                    color: currentColors.text}]}>{denyText}</Text>
-                            </TouchableOpacity>
+                            {onDeny && (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.button,
+                                        {
+                                            backgroundColor: currentColors.error,
+                                            borderWidth: 1,
+                                            borderColor: currentColors.errorBorder,
+                                        }
+                                    ]}
+                                    onPress={onDeny}
+                                >
+                                    <Text style={[styles.buttonText, {
+                                        color: currentColors.text
+                                    }]}>{denyText}</Text>
+                                </TouchableOpacity>
+                            )}
 
                             <TouchableOpacity
                                 style={[
@@ -91,7 +94,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                                 onPress={onConfirm}
                             >
                                 <Text style={[styles.buttonText, {
-                                    color: currentColors.text}]}>{confirmText}</Text>
+                                    color: currentColors.text
+                                }]}>{confirmText}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

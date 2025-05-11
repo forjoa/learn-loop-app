@@ -21,7 +21,7 @@ export default function NotificationScreen() {
     const loadNotifications = async () => {
         const token = await SecureStorage.getItemAsync('authToken')
         if (user) {
-            const response = await fetch(`${API_URL}/notifications/get?userId=${user?.id as number}`, {
+            const response = await fetch(`${API_URL}/notifications/get?userId=${user?.id as string}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -31,6 +31,20 @@ export default function NotificationScreen() {
             const result = await response.json()
             setNotifications(result)
         }
+    }
+
+    const enrollmentAction = async (enrollmentId: string, action: string) => {
+        const token = await SecureStorage.getItemAsync('authToken')
+        const response = await fetch(`${API_URL}/enrollments/${action}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({id: enrollmentId}),
+        })
+        const result = await response.json()
+        console.log(result)
     }
 
     useEffect(() => {
@@ -76,6 +90,10 @@ export default function NotificationScreen() {
                 cancelText="Cancelar"
                 onConfirm={() => {
                     console.log('Acción confirmada')
+                    console.log(selectedNotification)
+                    if (selectedNotification?.enrollmentId) {
+                        enrollmentAction(selectedNotification.enrollmentId, 'accept')
+                    }
                     setShowAlert(false)
                 }}
                 onCancel={() => {
@@ -84,6 +102,9 @@ export default function NotificationScreen() {
                 }}
                 onDeny={() => {
                     console.log('Acción denegada')
+                    if (selectedNotification?.enrollmentId) {
+                        enrollmentAction(selectedNotification.enrollmentId, 'deny')
+                    }
                     setShowAlert(false)
                 }}
                 theme={theme}
