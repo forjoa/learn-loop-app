@@ -55,7 +55,7 @@ export default function NotificationScreen() {
         <>
             <Main onLoad={loadNotifications}>
                 {notifications?.length < 1 ? (
-                    <Text style={[{color: Colors[theme].text}]}>No hay notificaciones</Text>
+                    <Text style={[{color: Colors[theme].textSecondary}]}>No hay notificaciones</Text>
                 ) : (
                     notifications.map((notif, index) => (
                         <TouchableOpacity key={index} style={[styles.nav, {
