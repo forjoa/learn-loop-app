@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useState } from 'react'
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 
-export default function Main({children, onLoad}: { children: ReactNode, onLoad: () => void }) {
+export default function Main({children, onLoad}: { children: ReactNode, onLoad: () => Promise<void> }) {
     const [refreshing, setRefreshing] = useState(false)
 
     const onRefresh = useCallback(() => {

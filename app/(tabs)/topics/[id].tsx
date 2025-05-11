@@ -1,8 +1,8 @@
-import { RelativePathString, router, useLocalSearchParams } from 'expo-router'
+import { RelativePathString, router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { Text, StyleSheet, useColorScheme, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
 import Main from '@/components/ui/main'
 import { Colors } from '@/constants/Colors'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { API_URL } from '@/constants/config'
 import * as SecureStore from 'expo-secure-store'
 import { DetailedTopic } from '@/lib/interfaces'
@@ -19,27 +19,28 @@ export default function TopicDetails() {
     const {id} = useLocalSearchParams()
     const theme = useColorScheme() || 'dark'
 
-    const loadTopic = async () => {
+    const loadTopic = async (topicId: string) => {
         const token = await SecureStore.getItemAsync('authToken')
-        const result = await fetch(`${API_URL}/topics/topic?id=${id}`, {
-            'method': 'GET',
-            'headers': {
+        const result = await fetch(`${API_URL}/topics/topic?id=${topicId}`, {
+            method: 'GET',
+            headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             }
         })
         const data = await result.json()
-
         setTopic(data)
     }
 
     useEffect(() => {
-        loadTopic()
+        if (typeof id === 'string') {
+            loadTopic(id)
+        }
     }, [id])
 
     return (
         <>
-            <Main onLoad={loadTopic}>
+            <Main onLoad={() => loadTopic(id as string)}>
                 <View>
                     <TouchableOpacity style={styles.backContainer}
                                       onPress={() => router.push(`/` as RelativePathString)}>
