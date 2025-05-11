@@ -25,19 +25,18 @@ export default function ProfileScreen() {
     const colorScheme = useColorScheme() || 'dark'
     const {user, logout} = useAuth()
 
+    const loadProfileData = async () => {
+        if (!user) return
+
+        const t = await SecureStore.getItemAsync('authToken')
+        setToken(t!)
+        setProfilePhoto(user.photo)
+        setRole(user.role)
+    }
+
     useEffect(() => {
-        setProfilePhoto(user?.photo)
-        setRole(user?.role as string)
+        loadProfileData()
     }, [user])
-
-    useEffect(() => {
-        const loadToken = async () => {
-            const t = await SecureStore.getItemAsync('authToken')
-            setToken(t!)
-        }
-
-        loadToken()
-    }, [])
 
     const handleEditSubmit = async () => {
         try {
@@ -52,7 +51,7 @@ export default function ProfileScreen() {
                     role,
                     id: user?.id,
                     name: user?.name,
-                    email: user?.email
+                    email: user?.email,
                 }),
             })
             const result = await response.json()
@@ -69,7 +68,7 @@ export default function ProfileScreen() {
 
     return (
         <>
-            <Main>
+            <Main onLoad={loadProfileData}>
                 <View style={styles.container}>
                     <View style={styles.imageWrapper}>
                         <Image

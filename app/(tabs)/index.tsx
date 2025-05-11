@@ -12,31 +12,33 @@ import TopicCard from '@/components/ui/topic-card'
 export default function HomeScreen() {
     const [topics, setTopics] = useState<TopicWithUsers[]>()
     const colorScheme = useColorScheme() || 'dark'
-    // const textColor = Colors[colorScheme].text
     const {user} = useAuth()
+
+    const loadTopics = async () => {
+        if (!user) return
+
+        const t = await SecureStore.getItemAsync('authToken')
+        const result = await fetch(`${API_URL}/topics/getAllByUser?userId=${user.id}`, {
+            'method': 'GET',
+            'headers': {
+                'Authorization': `Bearer ${t}`,
+                'Content-Type': 'application/json',
+            }
+        })
+        const data = await result.json()
+        setTopics(data)
+    }
 
     useEffect(() => {
         if (user) {
-            const loadTopics = async () => {
-                const t = await SecureStore.getItemAsync('authToken')
-                const result = await fetch(`${API_URL}/topics/getAllByUser?userId=${user.id}`, {
-                    'method': 'GET',
-                    'headers': {
-                        'Authorization': `Bearer ${t}`,
-                        'Content-Type': 'application/json',
-                    }
-                })
-                const data = await result.json()
-                setTopics(data)
-            }
-
             loadTopics()
         }
-    }, [user])
+    }, [loadTopics, user])
 
     return (
-        <Main>
-            <Text style={[{color: Colors[colorScheme].textSecondary, marginBottom: 10}]}>Aquí encontrarás todos tus temas.</Text>
+        <Main onLoad={loadTopics}>
+            <Text style={[{color: Colors[colorScheme].textSecondary, marginBottom: 10}]}>Aquí encontrarás todos tus
+                temas.</Text>
             <View>
                 {topics && topics.map((topic) => (
                     <View key={topic.id}>

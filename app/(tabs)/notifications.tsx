@@ -18,28 +18,28 @@ export default function NotificationScreen() {
     const theme = useColorScheme() || 'dark'
     const {user} = useAuth()
 
-    useEffect(() => {
-        const loadNotifications = async () => {
-            const token = await SecureStorage.getItemAsync('authToken')
-            if (user) {
-                const response = await fetch(`${API_URL}/notifications/get?userId=${user?.id as number}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                })
-                const result = await response.json()
-                setNotifications(result)
-            }
+    const loadNotifications = async () => {
+        const token = await SecureStorage.getItemAsync('authToken')
+        if (user) {
+            const response = await fetch(`${API_URL}/notifications/get?userId=${user?.id as number}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+            const result = await response.json()
+            setNotifications(result)
         }
+    }
 
+    useEffect(() => {
         loadNotifications()
     }, [user])
 
     return (
         <>
-            <Main>
+            <Main onLoad={loadNotifications}>
                 {notifications?.length < 1 ? (
                     <Text style={[{color: Colors[theme].text}]}>No hay notificaciones</Text>
                 ) : (

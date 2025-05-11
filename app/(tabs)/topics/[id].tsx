@@ -19,27 +19,27 @@ export default function TopicDetails() {
     const {id} = useLocalSearchParams()
     const theme = useColorScheme() || 'dark'
 
+    const loadTopic = async () => {
+        const token = await SecureStore.getItemAsync('authToken')
+        const result = await fetch(`${API_URL}/topics/topic?id=${id}`, {
+            'method': 'GET',
+            'headers': {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        })
+        const data = await result.json()
+
+        setTopic(data)
+    }
+
     useEffect(() => {
-        const loadTopic = async () => {
-            const token = await SecureStore.getItemAsync('authToken')
-            const result = await fetch(`${API_URL}/topics/topic?id=${id}`, {
-                'method': 'GET',
-                'headers': {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                }
-            })
-            const data = await result.json()
-
-            setTopic(data)
-        }
-
         loadTopic()
     }, [id])
 
     return (
         <>
-            <Main>
+            <Main onLoad={loadTopic}>
                 <View>
                     <TouchableOpacity style={styles.backContainer}
                                       onPress={() => router.push(`/` as RelativePathString)}>

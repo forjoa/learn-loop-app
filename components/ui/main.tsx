@@ -1,17 +1,16 @@
 import { ReactNode, useCallback, useState } from 'react'
-import { RefreshControl, ScrollView, StyleSheet, useColorScheme, View } from 'react-native'
-import { Colors } from '@/constants/Colors'
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 
-export default function Main({children}: { children: ReactNode }) {
+export default function Main({children, onLoad}: { children: ReactNode, onLoad: () => void }) {
     const [refreshing, setRefreshing] = useState(false)
-    const colorScheme = useColorScheme() || 'dark'
 
     const onRefresh = useCallback(() => {
         setRefreshing(true)
+        onLoad()
         setTimeout(() => {
             setRefreshing(false)
         }, 1000)
-    }, [])
+    }, [onLoad])
 
     return (
         <View style={styles.titleContainer}>
@@ -25,7 +24,7 @@ export default function Main({children}: { children: ReactNode }) {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
             >
-                <View style={styles.childrenContainer} key={refreshing ? "refreshing" : "not-refreshing"}>
+                <View style={styles.childrenContainer} key={refreshing ? 'refreshing' : 'not-refreshing'}>
                     {children}
                 </View>
             </ScrollView>
