@@ -68,3 +68,11 @@ export interface File {
 export interface DetailedPost extends Post {
     file: File
 }
+
+export interface Chat {
+    id: string
+    type: string
+    topicId: string
+    topicName: string
+    users: User[]
+}
