@@ -1,5 +1,5 @@
 export interface User {
-    id: number
+    id: string
     name: string
     email: string
     password: string
@@ -8,17 +8,18 @@ export interface User {
 }
 
 export interface Topic {
-    id: number
+    id: string
     title: string
     description: string
-    ownerId: number
+    ownerId: string
 }
 
 export interface Noti {
-    id: number
-    userId: number
+    id: string
+    userId: string
     title: string
     content: string
+    enrollmentId?: string
     createdAt?: string
     updatedAt?: string
 }
@@ -30,20 +31,20 @@ export interface TopicWithUsers extends Topic {
 
 export interface UserInTopic {
     status: string
-    userId: number
+    userId: string
 }
 
 export interface Owner {
-    id: number
+    id: string
     name: string
 }
 
 export interface Post {
-    id: number
+    id: string
     title: string
     content: string
-    userId: number
-    topicId: number
+    userId: string
+    topicId: string
     createdAt: string
 }
 
@@ -54,14 +55,14 @@ export interface DetailedTopic extends Topic {
 }
 
 export interface File {
-    userId: number
-    id: number
+    userId: string
+    id: string
     createdAt: Date
     updatedAt: Date
     url: string
     filename: string
     fileType: string
-    postId: number
+    postId: string
 }
 
 export interface DetailedPost extends Post {
