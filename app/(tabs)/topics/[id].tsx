@@ -1,14 +1,25 @@
-import { RelativePathString, router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { Text, StyleSheet, useColorScheme, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
+import { RelativePathString, router, useLocalSearchParams } from 'expo-router'
+import {
+    Text,
+    StyleSheet,
+    useColorScheme,
+    View,
+    Image,
+    ScrollView,
+    TouchableOpacity,
+    Dimensions,
+    Share
+} from 'react-native'
 import Main from '@/components/ui/main'
 import { Colors } from '@/constants/Colors'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { API_URL } from '@/constants/config'
 import * as SecureStore from 'expo-secure-store'
 import { DetailedTopic } from '@/lib/interfaces'
 import { profileImages } from '@/assets/profile-images'
 import Feather from '@expo/vector-icons/Feather'
 import Post from '@/components/post'
+import { useAuth } from '@/hooks/useAuth'
 
 const {width} = Dimensions.get('window')
 
@@ -16,6 +27,7 @@ export default function TopicDetails() {
     const [topic, setTopic] = useState<DetailedTopic>()
     const [postIsVisible, setPostIsVisible] = useState(false)
     const [selectedPostId, setSelectedPostId] = useState<string>()
+    const {user} = useAuth()
     const {id} = useLocalSearchParams()
     const theme = useColorScheme() || 'dark'
 
@@ -41,7 +53,7 @@ export default function TopicDetails() {
     return (
         <>
             <Main onLoad={() => loadTopic(id as string)}>
-                <View>
+                <View style={styles.optionsContainer}>
                     <TouchableOpacity style={styles.backContainer}
                                       onPress={() => router.push(`/` as RelativePathString)}>
                         <Feather name="arrow-left" style={[{color: Colors[theme].text}]} size={14}/>
@@ -49,6 +61,18 @@ export default function TopicDetails() {
                             Volver
                         </Text>
                     </TouchableOpacity>
+                    {user?.id === topic?.ownerId && (
+                        <TouchableOpacity style={styles.backContainer} onPress={() => {
+                            Share.share({
+                                message: `¡Hola! Te invito a unirte a mi clase: ${topic?.id}. https://learn-loop-platform.vercel.app/`,
+                            })
+                        }}>
+                            <Text style={[{color: Colors[theme].text}]}>
+                                Compartir
+                            </Text>
+                            <Feather name="share" style={[{color: Colors[theme].text}]} size={14}/>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {topic ? (
                     <View style={[styles.container]}>
@@ -115,12 +139,21 @@ export default function TopicDetails() {
                 )}
             </Main>
 
-            <Post isVisible={postIsVisible} onClose={() => setPostIsVisible(false)} colorScheme={theme} currentPostId={selectedPostId!}/>
+            <Post isVisible={postIsVisible} onClose={() => setPostIsVisible(false)} colorScheme={theme}
+                  currentPostId={selectedPostId!}/>
         </>
     )
 }
 
 const styles = StyleSheet.create({
+    optionsContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        paddingTop: 10,
+    },
     backContainer: {
         display: 'flex',
         flexDirection: 'row',

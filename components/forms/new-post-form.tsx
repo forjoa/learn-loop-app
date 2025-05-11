@@ -305,16 +305,14 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
-        padding: 15,
-        borderRadius: 15,
-        borderTopWidth: 1.5,
-        borderLeftWidth: 0.5,
-        borderRightWidth: 0.5,
+        gap: 8,
+        padding: 10,
+        borderRadius: 10,
+        borderWidth: 1
     },
     typeContainer: {
         paddingHorizontal: 7,
         paddingVertical: 9,
-        borderRadius: 10,
+        borderRadius: 5,
     }
 })
