@@ -105,7 +105,7 @@ export default function Post({
                                     </View>
                                 </TouchableOpacity>
                             ) : (
-                                <Text style={[{color: Colors[theme].text}]}>No hay archivos disponibles</Text>
+                                <Text style={[{color: Colors[theme].textSecondary}]}>No hay archivos disponibles</Text>
                             )}
                         </ScrollView>
                     </View>

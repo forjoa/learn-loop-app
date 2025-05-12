@@ -195,29 +195,28 @@ export const createPost = async (title: string, content: string, selectedTopicId
     try {
         setLoading(true)
 
-        if (!selectedDocument) {
-            Alert.alert('Error', 'No se ha seleccionado ningún documento.')
-            return
+        let result
+
+        if (selectedDocument) {
+            const file = {
+                uri: selectedDocument?.uri,
+                name: selectedDocument?.name,
+                type: getMimeType(selectedDocument?.name),
+            }
+
+            const data = new FormData()
+            data.append('file', file as any)
+            data.append('upload_preset', 'learn-loop')
+            data.append('api_key', env.CLOUDINARY_KEY!)
+
+            const response = await fetch(env.CLOUDINARY_ENDPOINT!, {
+                method: 'POST',
+                body: data,
+            })
+
+            result = await response.json()
+            console.log('Upload result:', result)
         }
-
-        const file = {
-            uri: selectedDocument?.uri,
-            name: selectedDocument?.name,
-            type: getMimeType(selectedDocument?.name),
-        }
-
-        const data = new FormData()
-        data.append('file', file as any)
-        data.append('upload_preset', 'learn-loop')
-        data.append('api_key', env.CLOUDINARY_KEY!)
-
-        const response = await fetch(env.CLOUDINARY_ENDPOINT!, {
-            method: 'POST',
-            body: data,
-        })
-
-        const result = await response.json()
-        console.log('Upload result:', result)
 
         await fetch(`${API_URL}/posts`, {
                 method: 'POST',
@@ -230,12 +229,13 @@ export const createPost = async (title: string, content: string, selectedTopicId
                     content,
                     userId: user?.id,
                     topicId: selectedTopicId,
-                    fileUrl: result.secure_url,
-                    filename: selectedDocument.name.split('.')[0],
-                    fileType: selectedDocument.name.split('.')[1],
+                    fileUrl: result ? result.secure_url : null,
+                    filename: selectedDocument ? selectedDocument.name.split('.')[0] : null,
+                    fileType: selectedDocument ? selectedDocument.name.split('.')[1] : null,
                 })
             }
         )
+
         Alert.alert('Éxito', 'Post creado correctamente')
         resetForm()
         onClose()

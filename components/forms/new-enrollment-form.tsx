@@ -46,7 +46,7 @@ export const requestEnrollment = async (topicId: string, setLoading: (loading: b
             },
             body: JSON.stringify({
                 userId: user?.id,
-                topicId: parseInt(topicId),
+                topicId: topicId,
             })
         })
         Alert.alert('Éxito', 'Solicitud de inscripción enviada correctamente')
