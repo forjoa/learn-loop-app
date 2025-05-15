@@ -1,4 +1,4 @@
-import { StyleSheet, Text, useColorScheme, View } from 'react-native'
+import { Text, useColorScheme, View } from 'react-native'
 
 import { Colors } from '@/constants/Colors'
 import Main from '@/components/ui/main'
@@ -53,5 +53,3 @@ export default function HomeScreen() {
         </Main>
     )
 }
-
-const styles = StyleSheet.create({})
