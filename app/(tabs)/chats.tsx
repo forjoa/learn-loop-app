@@ -37,7 +37,6 @@ export default function ChatsScreen() {
         <Main onLoad={loadChats}>
             {chats?.length > 0 ? (
                 chats.map((chat) => {
-                    console.log(chat)
                     return (
                         <TouchableOpacity style={[styles.chatContainer, {
                             borderColor: Colors[theme].nav.border,
@@ -84,6 +83,6 @@ const styles = StyleSheet.create({
         borderTopWidth: 1.5,
         borderLeftWidth: 0.5,
         borderRightWidth: 0.5,
-        borderBottomWidth: 0.25
+        borderBottomWidth: 0.255
     }
 })

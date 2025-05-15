@@ -40,7 +40,6 @@ export default function Post({
     }, [])
 
     useEffect(() => {
-        console.log(currentPostId)
         if (currentPostId) {
             const loadPost = async () => {
                 const result = await fetch(`${API_URL}/posts/?id=${currentPostId}`, {
@@ -53,7 +52,6 @@ export default function Post({
                 const data = await result.json()
 
                 setPost(data)
-                console.log(data)
             }
 
             loadPost()

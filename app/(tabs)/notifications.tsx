@@ -43,8 +43,7 @@ export default function NotificationScreen() {
             },
             body: JSON.stringify({id: enrollmentId}),
         })
-        const result = await response.json()
-        console.log(result)
+        await response.json()
     }
 
     useEffect(() => {
@@ -89,19 +88,15 @@ export default function NotificationScreen() {
                 denyText="Rechazar"
                 cancelText="Cancelar"
                 onConfirm={() => {
-                    console.log('Acción confirmada')
-                    console.log(selectedNotification)
                     if (selectedNotification?.enrollmentId) {
                         enrollmentAction(selectedNotification.enrollmentId, 'accept')
                     }
                     setShowAlert(false)
                 }}
                 onCancel={() => {
-                    console.log('Acción cancelada')
                     setShowAlert(false)
                 }}
                 onDeny={() => {
-                    console.log('Acción denegada')
                     if (selectedNotification?.enrollmentId) {
                         enrollmentAction(selectedNotification.enrollmentId, 'deny')
                     }

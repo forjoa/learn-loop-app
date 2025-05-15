@@ -50,9 +50,7 @@ export default function NewPostForm({
     const theme = useColorScheme() || 'dark'
 
     const handleDelete = () => {
-        console.log('Documento a eliminar:', selectedDocument?.name)
-
-        setSelectedDocument(null) // Limpia el documento seleccionado
+        setSelectedDocument(null)
     }
 
     return (
@@ -215,7 +213,6 @@ export const createPost = async (title: string, content: string, selectedTopicId
             })
 
             result = await response.json()
-            console.log('Upload result:', result)
         }
 
         await fetch(`${API_URL}/posts`, {

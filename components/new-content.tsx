@@ -97,11 +97,9 @@ export default function NewContent({
                 const successResult = result as DocumentPicker.DocumentPickerSuccessResult
 
                 setSelectedDocument(successResult.assets[0])
-            } else {
-                console.log('Document selection cancelled.')
-            }
+            } 
         } catch (error) {
-            console.log('Error picking documents:', error)
+            console.error('Error picking documents:', error)
         }
     }
 
