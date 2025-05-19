@@ -18,15 +18,25 @@ import { API_URL } from '@/constants/config'
 import { Message } from '@/lib/interfaces'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useAuth } from '@/hooks/useAuth'
+// eslint-disable-next-line import/no-named-as-default
+import io, { Socket } from 'socket.io-client'
 
 export default function ChatScreen() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
+  const [socket, setSocket] = useState<Socket | null>(null)
   const colorScheme = useColorScheme() || 'dark'
   const messagesEndRef = useRef<ScrollView>(null)
   const { user } = useAuth()
 
   const { id } = useLocalSearchParams()
+
+  useEffect((): any => {
+    const newSocket = io(API_URL)
+    setSocket(newSocket)
+
+    return () => newSocket.close()
+  }, [])
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -53,29 +63,56 @@ export default function ChatScreen() {
     loadMessages()
   }, [id])
 
-  const handleMessageSend = async () => {
-    console.log({
-      chatId: id,
-      content: message,
-      senderId: user?.id,
-    })
+  useEffect(() => {
+    if (socket && id) {
+      socket.emit('joinRoom', id.toString())
 
-    const t = await SecureStore.getItemAsync('authToken')
-    const result = await fetch(`${API_URL}/messages/send`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${t}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chatId: id,
-        content: message,
-        senderId: user?.id,
-      }),
-    })
-    const data = await result.json()
-    setMessages((prevMessages) => [...prevMessages, data])
-    setMessage('')
+      socket.on('chatMessage', (message: Message) => {
+        if (message.sender.id !== user?.id) {
+          setMessages((prevMessages) => [...prevMessages, message])
+        }
+      })
+
+      return () => {
+        socket.off('chatMessage')
+      }
+    }
+  }, [socket, id, user])
+
+  const getInitials = (name: string) => {
+    return name.split(' ')[0]
+  }
+
+  const handleMessageSend = async () => {
+    if (!message || message.trim() === '') return
+
+    if (socket && id && user) {
+      const t = await SecureStore.getItemAsync('authToken')
+
+      const result = await fetch(`${API_URL}/messages/send`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${t}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chatId: id,
+          content: message,
+          senderId: user?.id,
+        }),
+      })
+
+      const { data } = await result.json()
+
+      setMessages((prevMessages) => [...prevMessages, data])
+
+      socket.emit('chatMessage', {
+        room: id.toString(),
+        message: data,
+      })
+
+      setMessage('')
+    }
   }
 
   return (
@@ -125,8 +162,21 @@ export default function ChatScreen() {
                 marginBottom: 10,
                 alignSelf:
                   message.sender.id === user.id ? 'flex-end' : 'flex-start',
+                maxWidth: '80%',
               }}
             >
+              {/* Mostrar iniciales solo si no es el usuario actual */}
+              {message.sender.id !== user.id && (
+                <Text
+                  style={{
+                    color: Colors[colorScheme].textSecondary,
+                    fontSize: 12,
+                    marginBottom: 4,
+                  }}
+                >
+                  {getInitials(message.sender.name!)}
+                </Text>
+              )}
               <Text
                 style={{
                   color:
