@@ -1,0 +1,31 @@
+{
+  "cli": {
+    "version": ">= 16.6.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_CLOUD_NAME": "drqv0jv7c",
+        "EXPO_PUBLIC_CLOUDINARY_ENDPOINT": "https://api.cloudinary.com/v1_1/drqv0jv7c/image/upload",
+        "EXPO_PUBLIC_CLOUDINARY_API_KEY": "896891621766718",
+        "EXPO_PUBLIC_API_URL": "https://api.staging.example.com",
+        "EXPO_PUBLIC_API_KEY": "staging_api_key"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
