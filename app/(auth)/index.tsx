@@ -13,13 +13,13 @@ import {
 } from 'react-native'
 import { useAuth } from '@/hooks/useAuth'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Href, Link, router } from 'expo-router'
+import { Href, router } from 'expo-router'
 import { Colors } from '@/constants/Colors'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { login, loading, error } = useAuth()
+  const { login, loading } = useAuth()
   const [loginError, setLoginError] = useState<string | null>(null)
   const colorScheme = useColorScheme() || 'dark'
 

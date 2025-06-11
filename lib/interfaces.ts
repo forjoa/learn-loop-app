@@ -85,4 +85,5 @@ export interface Message {
   sender: Partial<User>
   chatId: string
   createdAt: string
+  chat: { topic: { title: string } }
 }

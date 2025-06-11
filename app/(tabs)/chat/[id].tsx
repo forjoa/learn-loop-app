@@ -135,7 +135,7 @@ export default function ChatScreen() {
             size={20}
             color={Colors[colorScheme].textSecondary}
           />
-          <Text style={[{ color: Colors[colorScheme].text }]}>{id}</Text>
+          <Text style={[{ color: Colors[colorScheme].text }]}>{messages[0] ? messages[0].chat?.topic?.title : ''}</Text>
         </TouchableOpacity>
       </View>
 
@@ -259,6 +259,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 10,
     gap: 10,
   },
   chatList: {
