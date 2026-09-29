@@ -168,8 +168,7 @@ export default function Register() {
                                     backgroundColor: Colors[colorScheme].primary + '20'
                                 },
                                 {
-                                    backgroundColor: Colors[colorScheme].input,
-                                    backdropFilter: 'blur(10px)'
+                                    backgroundColor: Colors[colorScheme].input
                                 }
                             ]}>
                                 <Text style={[
@@ -379,8 +378,7 @@ const styles = StyleSheet.create({
     dropdownItem: {
         padding: 15,
         height: 50,
-        justifyContent: 'center',
-        backdropFilter: 'blur(10px)'
+        justifyContent: 'center'
     },
     dropdownItemText: {
         // fontSize: 16

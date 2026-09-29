@@ -257,7 +257,6 @@ const styles = StyleSheet.create({
         padding: 15,
         height: 50,
         justifyContent: 'center',
-        backdropFilter: 'blur(10px)',
     },
     dropdownItemText: {},
     primary: {

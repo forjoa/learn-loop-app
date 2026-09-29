@@ -58,12 +58,6 @@ export default function NewContent({
         loadToken()
     }, [])
 
-    useEffect(() => {
-        if (isVisible && formType === 'post' && isTeacher) {
-            fetchTopicsByOwner()
-        }
-    }, [isVisible, formType])
-
     const fetchTopicsByOwner = async () => {
         try {
             setLoadingTopics(true)
@@ -86,6 +80,12 @@ export default function NewContent({
             setLoadingTopics(false)
         }
     }
+
+    useEffect(() => {
+        if (isVisible && formType === 'post' && isTeacher) {
+            fetchTopicsByOwner()
+        }
+    }, [isVisible, formType])
 
     const pickDocuments = async () => {
         try {
