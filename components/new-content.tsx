@@ -31,7 +31,7 @@ export default function NewContent({
                                        onClose,
                                        colorScheme = 'dark',
                                    }: NewBottomSheetProps) {
-    const theme = colorScheme || 'dark'
+    const theme = colorScheme === 'light' ? 'light' : 'dark'
     const {user} = useAuth()
 
     const [formType, setFormType] = useState<'topic' | 'post' | 'enrollment'>('enrollment')

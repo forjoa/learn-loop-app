@@ -11,7 +11,7 @@ import TopicCard from '@/components/ui/topic-card'
 
 export default function HomeScreen() {
     const [topics, setTopics] = useState<TopicWithUsers[]>()
-    const colorScheme = useColorScheme() || 'dark'
+    const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
     const {user} = useAuth()
 
     const loadTopics = async () => {

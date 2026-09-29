@@ -31,7 +31,7 @@ export default function Register() {
     const [role, setRole] = useState('STUDENT')
     const [profileImage, setProfileImage] = useState('ant.png')
     const [registering, setRegistering] = useState(false)
-    const colorScheme = useColorScheme() || 'dark'
+    const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
     const {register, error} = useAuth()
 
     const handleRegister = async () => {

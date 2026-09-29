@@ -47,7 +47,7 @@ export default function NewPostForm({
                                         selectedDocument,
                                         setSelectedDocument
                                     }: NewPostFormProps) {
-    const theme = useColorScheme() || 'dark'
+    const theme = useColorScheme() === 'light' ? 'light' : 'dark'
 
     const handleDelete = () => {
         setSelectedDocument(null)

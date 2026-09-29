@@ -30,7 +30,7 @@ export default function SelectEditPhoto({
                                             currentPhoto,
                                             colorScheme = 'dark',
                                         }: SelectEditPhotoProps) {
-    const theme = colorScheme || 'dark'
+    const theme = colorScheme === 'light' ? 'light' : 'dark'
     const [selected, setSelected] = useState<string | undefined>(currentPhoto)
 
     useEffect(() => {

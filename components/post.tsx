@@ -28,7 +28,7 @@ export default function Post({
                              }: PostProps) {
     const [post, setPost] = useState<DetailedPost>()
     const [token, setToken] = useState('')
-    const theme = colorScheme || 'dark'
+    const theme = colorScheme === 'light' ? 'light' : 'dark'
 
     useEffect(() => {
         const loadToken = async () => {

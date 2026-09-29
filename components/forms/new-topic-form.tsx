@@ -11,7 +11,7 @@ interface NewTopicFormProps {
 }
 
 export default function NewTopicForm({ title, setTitle, description, setDescription }: NewTopicFormProps) {
-    const theme = useColorScheme() || 'dark'
+    const theme = useColorScheme() === 'light' ? 'light' : 'dark'
 
     return (
         <View style={styles.form}>

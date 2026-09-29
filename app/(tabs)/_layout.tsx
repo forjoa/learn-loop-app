@@ -9,7 +9,7 @@ import Constants from 'expo-constants'
 
 export default function TabLayout() {
   const [isNewBottomSheetVisible, setIsNewBottomSheetVisible] = useState(false)
-  const colorScheme = useColorScheme() || 'dark'
+  const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
   const pathname = usePathname()
   const isChatScreen = pathname.startsWith('/chat/')
 

@@ -31,7 +31,7 @@ export default function TopicDetails() {
   const [modalOpen, setModalOpen] = useState(false)
   const { user } = useAuth()
   const { id } = useLocalSearchParams()
-  const theme = useColorScheme() || 'dark'
+  const theme = useColorScheme() === 'light' ? 'light' : 'dark'
 
   const loadTopic = async (topicId: string) => {
     const token = await SecureStore.getItemAsync('authToken')

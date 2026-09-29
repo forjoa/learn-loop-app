@@ -9,7 +9,7 @@ interface NewEnrollmentFormProps {
 }
 
 export default function NewEnrollmentForm({topicId, setTopicId}: NewEnrollmentFormProps) {
-    const theme = useColorScheme() || 'dark'
+    const theme = useColorScheme() === 'light' ? 'light' : 'dark'
 
     return (
         <View style={styles.form}>
@@ -21,7 +21,7 @@ export default function NewEnrollmentForm({topicId, setTopicId}: NewEnrollmentFo
                 placeholder="ID del tema"
                 value={topicId}
                 onChangeText={setTopicId}
-                keyboardType="numeric"
+                // keyboardType="numeric"
             />
             <Text style={[styles.enrollmentHelp, {color: Colors[theme].textSecondary || Colors[theme].text}]}>
                 Ingresa solamente el número ID del tema compartido por tu profesor.

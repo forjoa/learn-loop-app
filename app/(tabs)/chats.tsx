@@ -19,7 +19,7 @@ import { RelativePathString, router } from 'expo-router'
 export default function ChatsScreen() {
   const [chats, setChats] = useState<Chat[]>([])
   const { user } = useAuth()
-  const theme = useColorScheme() || 'dark'
+  const theme = useColorScheme() === 'light' ? 'light' : 'dark'
 
   const loadChats = async () => {
     const token = await SecureStorage.getItemAsync('authToken')

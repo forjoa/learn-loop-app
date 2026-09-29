@@ -40,7 +40,7 @@ export function FloatingButton({
   const [isLoading, setIsLoading] = useState(false)
   const [examData, setExamData] = useState<string>('')
   const [showBottomSheet, setShowBottomSheet] = useState(false)
-  const colorScheme = useColorScheme() || 'dark'
+  const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
   const animation = useSharedValue(0)
 
   const rotationAnimatedStyle = useAnimatedStyle(() => {

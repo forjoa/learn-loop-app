@@ -22,7 +22,7 @@ export default function ProfileScreen() {
     const [profilePhoto, setProfilePhoto] = useState<string>()
     const [role, setRole] = useState<string>()
     const [token, setToken] = useState('')
-    const colorScheme = useColorScheme() || 'dark'
+    const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
     const {user, logout} = useAuth()
 
     const loadProfileData = async () => {

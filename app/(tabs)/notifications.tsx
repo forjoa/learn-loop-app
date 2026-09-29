@@ -15,7 +15,7 @@ export default function NotificationScreen() {
     const [selectedNotification, setSelectedNotification] = useState<Noti>()
     const [showAlert, setShowAlert] = useState(false)
 
-    const theme = useColorScheme() || 'dark'
+    const theme = useColorScheme() === 'light' ? 'light' : 'dark'
     const {user} = useAuth()
 
     const loadNotifications = async () => {

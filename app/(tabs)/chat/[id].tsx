@@ -25,7 +25,7 @@ export default function ChatScreen() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [socket, setSocket] = useState<Socket | null>(null)
-  const colorScheme = useColorScheme() || 'dark'
+  const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
   const messagesEndRef = useRef<ScrollView>(null)
   const { user } = useAuth()
 

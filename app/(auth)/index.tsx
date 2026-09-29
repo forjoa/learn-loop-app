@@ -21,7 +21,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const { login, loading } = useAuth()
   const [loginError, setLoginError] = useState<string | null>(null)
-  const colorScheme = useColorScheme() || 'dark'
+  const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
 
   const handleLogin = async () => {
     if (!email || !password) {

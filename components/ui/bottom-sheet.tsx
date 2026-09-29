@@ -40,7 +40,7 @@ export default function BottomSheet({
     const translateY = useSharedValue(0)
     const backdropOpacity = useSharedValue(0)
     const context = useSharedValue({y: 0})
-    const theme = colorScheme || 'dark'
+    const theme = colorScheme === 'light' ? 'light' : 'dark'
 
     const scrollTo = (
         destination: number,

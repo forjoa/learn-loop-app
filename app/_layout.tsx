@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/useAuth'
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
+import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router/react-navigation'
 import { useFonts } from 'expo-font'
 import { Redirect, Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
@@ -19,7 +19,7 @@ export default function RootLayout() {
     })
 
     const { user, loading: authLoading } = useAuth()
-    const colorScheme = useColorScheme() || 'dark'
+    const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
 
     const customDarkTheme = {
         ...DarkTheme,
