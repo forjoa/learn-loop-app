@@ -2,11 +2,13 @@ import {
     ColorSchemeName,
     ScrollView,
     StyleSheet,
-    Text, TouchableOpacity,
+    Text, Pressable,
     View
 } from 'react-native'
 import BottomSheet from '@/components/ui/bottom-sheet'
 import { Colors } from '@/constants/Colors'
+import { GlassSurface } from '@/components/ui/glass-view'
+import { Radius, Spacing, Typography } from '@/constants/Theme'
 import { useEffect, useState } from 'react'
 import { DetailedPost } from '@/lib/interfaces'
 import { API_URL } from '@/constants/config'
@@ -82,26 +84,23 @@ export default function Post({
                             ]}/>
 
                             {post.file ? (
-                                <TouchableOpacity
-                                    style={[styles.fileContainer, {
-                                        backgroundColor: Colors[theme].nav.background,
-                                        borderColor: Colors[theme].nav.border
-                                    }]}
-                                    onPress={() => handlePressButtonAsync(post?.file.url)}>
-                                    <View style={[styles.typeContainer, {backgroundColor: Colors[theme].error}]}>
-                                        <Text style={[{color: '#fff'}]}>
-                                            {post.file.fileType}
-                                        </Text>
-                                    </View>
-                                    <View>
-                                        <Text style={[{color: Colors[theme].text}]}>
-                                            {`${post.file.filename}.${post.file.fileType}`}
-                                        </Text>
-                                        <Text style={[{color: Colors[theme].textSecondary}]}>
-                                            Publicado {new Date(post.file.createdAt!).getDay()}/{new Date(post.file.createdAt!).getMonth() + 1}
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
+                                <Pressable onPress={() => handlePressButtonAsync(post?.file.url)}>
+                                    <GlassSurface tint={theme} radius={Radius.lg} style={styles.fileContainer}>
+                                        <View style={[styles.typeContainer, {backgroundColor: Colors[theme].error}]}>
+                                            <Text style={[{color: '#fff'}]}>
+                                                {post.file.fileType}
+                                            </Text>
+                                        </View>
+                                        <View>
+                                            <Text style={[{color: Colors[theme].text}]}>
+                                                {`${post.file.filename}.${post.file.fileType}`}
+                                            </Text>
+                                            <Text style={[{color: Colors[theme].textSecondary}]}>
+                                                Publicado {new Date(post.file.createdAt!).getDay()}/{new Date(post.file.createdAt!).getMonth() + 1}
+                                            </Text>
+                                        </View>
+                                    </GlassSurface>
+                                </Pressable>
                             ) : (
                                 <Text style={[{color: Colors[theme].textSecondary}]}>No hay archivos disponibles</Text>
                             )}
@@ -119,32 +118,27 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        ...Typography.title,
+        marginBottom: Spacing.lg,
     },
     scrollContainer: {
         flex: 1,
         height: '100%',
     },
     hr: {
-        height: 1,
-        marginVertical: 20,
+        height: StyleSheet.hairlineWidth,
+        marginVertical: Spacing.lg,
     },
     fileContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
-        padding: 15,
-        borderRadius: 15,
-        borderTopWidth: 1.5,
-        borderLeftWidth: 0.5,
-        borderRightWidth: 0.5,
+        gap: Spacing.md,
+        padding: Spacing.base,
     },
     typeContainer: {
-        paddingHorizontal: 10,
-        paddingVertical: 13,
-        borderRadius: 10,
+        paddingHorizontal: Spacing.md,
+        paddingVertical: Spacing.md,
+        borderRadius: Radius.sm,
     }
 })

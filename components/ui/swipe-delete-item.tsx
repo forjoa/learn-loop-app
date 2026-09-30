@@ -10,6 +10,8 @@ import Animated, {
     SharedValue,
 } from 'react-native-reanimated'
 import Feather from '@expo/vector-icons/Feather'
+import * as Haptics from 'expo-haptics'
+import { Radius } from '@/constants/Theme'
 
 // const SCREEN_WIDTH = Dimensions.get('window').width
 const RIGHT_ACTION_WIDTH = 80
@@ -65,6 +67,7 @@ const SwipeToDeleteItem: React.FC<SwipeToDeleteItemProps> = ({
     const handleSwipeOpen = (direction: 'left' | 'right') => {
         if (direction === 'left') {
             if (onDelete) {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
                 onDelete()
             }
         }
@@ -100,8 +103,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: I18nManager.isRTL ? 'flex-start' : 'flex-end',
         width: RIGHT_ACTION_WIDTH,
-        borderTopRightRadius: 15,
-        borderBottomRightRadius: 15,
+        borderTopRightRadius: Radius.lg,
+        borderBottomRightRadius: Radius.lg,
         marginLeft: -20
     },
     rightActionContent: {

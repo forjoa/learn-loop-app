@@ -1,5 +1,6 @@
 import { TextInput, View, StyleSheet, useColorScheme, Alert } from 'react-native'
 import { Colors } from '@/constants/Colors'
+import { Radius, Spacing, Typography } from '@/constants/Theme'
 import { API_URL } from '@/constants/config'
 import { User } from '@/lib/interfaces'
 
@@ -18,24 +19,28 @@ export default function NewTopicForm({ title, setTitle, description, setDescript
             <TextInput
                 style={[styles.input,
                     {
-                        color: Colors[theme].text, borderColor:
-                        Colors[theme].border
+                        color: Colors[theme].text,
+                        backgroundColor: Colors[theme].input,
+                        borderColor: Colors[theme].border,
                     }
                 ]
                 }
                 placeholder="Título del tema"
+                placeholderTextColor={Colors[theme].textSecondary}
                 value={title}
                 onChangeText={setTitle}
             />
             <TextInput
                 style={[styles.textarea,
                     {
-                        color: Colors[theme].text, borderColor:
-                        Colors[theme].border
+                        color: Colors[theme].text,
+                        backgroundColor: Colors[theme].input,
+                        borderColor: Colors[theme].border,
                     }
                 ]
                 }
                 placeholder="Descripción del tema"
+                placeholderTextColor={Colors[theme].textSecondary}
                 value={description}
                 onChangeText={setDescription}
                 multiline
@@ -78,22 +83,23 @@ export const createTopic = async (title: string, description: string, setLoading
 
 const styles = StyleSheet.create({
     form: {
-        marginBottom: 20,
+        marginBottom: Spacing.lg,
+        gap: Spacing.md,
     },
     label: {
-        marginBottom: 8,
+        marginBottom: Spacing.sm,
     },
     input: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 16,
+        ...Typography.body,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: Radius.md,
+        padding: Spacing.base,
     },
     textarea: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 16,
+        ...Typography.body,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: Radius.md,
+        padding: Spacing.base,
         textAlignVertical: 'top',
     }
 })

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Image,
     StyleSheet,
@@ -10,19 +10,46 @@ import {
     useColorScheme,
     Alert,
 } from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming, withSpring, Easing } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Href, router } from 'expo-router'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import { Colors } from '@/constants/Colors'
 import { profileImages } from '@/assets/profile-images'
 import { useAuth } from '@/hooks/useAuth'
-import { MaterialIcons } from '@expo/vector-icons'
-import SelectDropdown from 'react-native-select-dropdown'
+import { GlassSurface } from '@/components/ui/glass-view'
+import { Button } from '@/components/ui/button'
+import { SegmentedControl } from '@/components/ui/segmented-control'
+import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
 
 const roles = [
     {label: 'Estudiante', value: 'STUDENT'},
     {label: 'Profesor', value: 'TEACHER'}
 ]
+
+function ProfileOption({ image, selected, onPress, tint }: { image: string, selected: boolean, onPress: () => void, tint: 'light' | 'dark' }) {
+    const scale = useSharedValue(1)
+    const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }))
+
+    return (
+        <Animated.View style={animatedStyle}>
+            <Pressable
+                onPressIn={() => { scale.value = withSpring(0.9, Motion.spring) }}
+                onPressOut={() => { scale.value = withSpring(selected ? 1.06 : 1, Motion.spring) }}
+                onPress={() => {
+                    onPress()
+                    scale.value = withSpring(1.06, Motion.spring)
+                }}
+                style={[
+                    styles.profileOption,
+                    { borderColor: selected ? Colors[tint].primary : 'transparent' },
+                ]}
+            >
+                <Image source={profileImages[image]} style={styles.profileImage} />
+            </Pressable>
+        </Animated.View>
+    )
+}
 
 export default function Register() {
     const [name, setName] = useState('')
@@ -33,6 +60,15 @@ export default function Register() {
     const [registering, setRegistering] = useState(false)
     const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
     const {register, error} = useAuth()
+
+    const entrance = useSharedValue(0)
+    useEffect(() => {
+        entrance.value = withDelay(80, withTiming(1, { duration: Motion.durationSlow, easing: Easing.out(Easing.cubic) }))
+    }, [])
+    const entranceStyle = useAnimatedStyle(() => ({
+        opacity: entrance.value,
+        transform: [{ translateY: (1 - entrance.value) * 24 }],
+    }))
 
     const handleRegister = async () => {
         if (!name || !email || !password) {
@@ -58,206 +94,106 @@ export default function Register() {
     }
 
     const goTo = (route: Href) => {
-        router.push(route)
+        if (router.canGoBack()) {
+            router.back()
+        } else {
+            router.push(route)
+        }
     }
 
     return (
-        <SafeAreaView style={styles.page}>
+        <SafeAreaView style={[styles.page, { backgroundColor: Colors[colorScheme].background }]}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1, width: '100%' }}
             >
                 <ScrollView
-                    style={[
-                        styles.container,
-                        {backgroundColor: Colors[colorScheme].nav.background}
-                    ]}
-                    contentContainerStyle={{flexGrow: 1}}
+                    contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
-                    <View style={styles.imageContainer}>
-                        <Image
-                            style={styles.image}
-                            source={profileImages[profileImage] ?? require('@/assets/images/droid.png')}
-                        />
-                    </View>
-                    <Text style={[
-                        styles.title,
-                        {color: Colors[colorScheme].text}
-                    ]}>Registro</Text>
-                    <Text style={[
-                        styles.span,
-                        {color: Colors[colorScheme].textSecondary}
-                    ]}>
-                        Crea una cuenta para comenzar a aprender o enseñar
-                    </Text>
-
-                    <TextInput
-                        style={[
-                            styles.input,
-                            {
-                                backgroundColor: Colors[colorScheme].input,
-                                color: Colors[colorScheme].text
-                            }
-                        ]}
-                        placeholder="Nombre"
-                        placeholderTextColor={Colors[colorScheme].textSecondary}
-                        value={name}
-                        onChangeText={setName}
-                    />
-                    <TextInput
-                        style={[
-                            styles.input,
-                            {
-                                backgroundColor: Colors[colorScheme].input,
-                                color: Colors[colorScheme].text
-                            }
-                        ]}
-                        placeholder="Email"
-                        placeholderTextColor={Colors[colorScheme].textSecondary}
-                        value={email}
-                        onChangeText={setEmail}
-                        keyboardType="email-address"
-                    />
-
-                    <TextInput
-                        style={[
-                            styles.input,
-                            {
-                                backgroundColor: Colors[colorScheme].input,
-                                color: Colors[colorScheme].text
-                            }
-                        ]}
-                        placeholder="****"
-                        placeholderTextColor={Colors[colorScheme].textSecondary}
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                    />
-
-                    <SelectDropdown
-                        data={roles}
-                        onSelect={(selectedItem) => setRole(selectedItem.value)}
-                        renderButton={(selectedItem, isOpened) => (
-                            <View style={[
-                                styles.dropdownButton,
-                                {
-                                    backgroundColor: Colors[colorScheme].input,
-                                    borderColor: Colors[colorScheme].border
-                                }
-                            ]}>
-                                <Text style={[
-                                    styles.dropdownButtonText,
-                                    {
-                                        color: Colors[colorScheme].text,
-                                        // fontSize: 16
-                                    }
-                                ]}>
-                                    {selectedItem?.label || 'Seleccionar rol'}
-                                </Text>
-                                <MaterialIcons
-                                    name={isOpened ? 'arrow-drop-up' : 'arrow-drop-down'}
-                                    size={24}
-                                    color={Colors[colorScheme].text}
-                                />
-                            </View>
-                        )}
-                        renderItem={(item, index, isSelected) => (
-                            <View style={[
-                                styles.dropdownItem,
-                                isSelected && {
-                                    backgroundColor: Colors[colorScheme].primary + '20'
-                                },
-                                {
-                                    backgroundColor: Colors[colorScheme].input
-                                }
-                            ]}>
-                                <Text style={[
-                                    styles.dropdownItemText,
-                                    {
-                                        color: Colors[colorScheme].text,
-                                        // fontSize: 16
-                                    }
-                                ]}>
-                                    {item.label}
-                                </Text>
-                            </View>
-                        )}
-                        dropdownStyle={[
-                            styles.dropdown,
-                            {
-                                backgroundColor: Colors[colorScheme].input,
-                                borderColor: Colors[colorScheme].border,
-                                marginTop: 5
-                            }
-                        ]}
-                    />
-
-                    <Text style={[
-                        styles.sectionTitle,
-                        {color: Colors[colorScheme].text}
-                    ]}>Selecciona tu foto de perfil</Text>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        style={styles.profileScroll}
-                    >
-                        {Object.keys(profileImages).map((image) => (
-                            <Pressable
-                                key={image}
-                                onPress={() => setProfileImage(image)}
-                                style={[
-                                    styles.profileOption,
-                                    profileImage === image && [
-                                        {borderColor: Colors[colorScheme].primary}
-                                    ],
-                                ]}
-                            >
+                    <Animated.View style={entranceStyle}>
+                        <GlassSurface tint={colorScheme} radius={Radius.xxl} style={styles.container}>
+                            <View style={styles.imageContainer}>
                                 <Image
-                                    source={profileImages[image]}
-                                    style={styles.profileImage}
+                                    style={styles.image}
+                                    source={profileImages[profileImage] ?? require('@/assets/images/droid.png')}
                                 />
-                            </Pressable>
-                        ))}
-                    </ScrollView>
+                            </View>
+                            <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Crea tu cuenta</Text>
+                            <Text style={[styles.span, { color: Colors[colorScheme].textSecondary }]}>
+                                Empieza a aprender o enseñar en minutos
+                            </Text>
 
-                    <Pressable
-                        style={[
-                            styles.primary,
-                            {
-                                backgroundColor: Colors[colorScheme].primary,
-                                borderColor: Colors[colorScheme].primaryBorder,
-                                opacity: registering ? 0.7 : 1
-                            }
-                        ]}
-                        onPress={handleRegister}
-                        disabled={registering}
-                    >
-                        <Text style={[
-                            styles.textPrimary,
-                            {color: '#fff'}
-                        ]}>{registering ? 'Registrando...' : 'Registrarse'}</Text>
-                    </Pressable>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    { backgroundColor: Colors[colorScheme].input, color: Colors[colorScheme].text, borderColor: Colors[colorScheme].border },
+                                ]}
+                                placeholder="Nombre"
+                                placeholderTextColor={Colors[colorScheme].textSecondary}
+                                value={name}
+                                onChangeText={setName}
+                            />
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    { backgroundColor: Colors[colorScheme].input, color: Colors[colorScheme].text, borderColor: Colors[colorScheme].border },
+                                ]}
+                                placeholder="Email"
+                                placeholderTextColor={Colors[colorScheme].textSecondary}
+                                value={email}
+                                onChangeText={setEmail}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                            />
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    { backgroundColor: Colors[colorScheme].input, color: Colors[colorScheme].text, borderColor: Colors[colorScheme].border },
+                                ]}
+                                placeholder="Contraseña"
+                                placeholderTextColor={Colors[colorScheme].textSecondary}
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry
+                            />
 
-                    <View style={[
-                        styles.hr,
-                        {backgroundColor: Colors[colorScheme].border}
-                    ]}/>
+                            <SegmentedControl
+                                options={roles}
+                                value={role}
+                                onChange={setRole}
+                                tint={colorScheme}
+                            />
 
-                    <Pressable
-                        style={[
-                            styles.secondary,
-                            {
-                                backgroundColor: Colors[colorScheme].secondary.background,
-                                borderColor: Colors[colorScheme].secondary.border
-                            }
-                        ]}
-                        onPress={() => goTo('/(auth)')}
-                    >
-                        <Text style={[
-                            styles.textSecondary,
-                            {color: Colors[colorScheme].secondary.text}
-                        ]}>Inicia sesión</Text>
-                    </Pressable>
+                            <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>Selecciona tu foto de perfil</Text>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                style={styles.profileScroll}
+                            >
+                                {Object.keys(profileImages).map((image) => (
+                                    <ProfileOption
+                                        key={image}
+                                        image={image}
+                                        selected={profileImage === image}
+                                        onPress={() => setProfileImage(image)}
+                                        tint={colorScheme}
+                                    />
+                                ))}
+                            </ScrollView>
+
+                            <Button
+                                label={registering ? 'Registrando...' : 'Registrarse'}
+                                onPress={handleRegister}
+                                loading={registering}
+                                style={{ marginTop: Spacing.sm }}
+                            />
+
+                            <View style={[styles.hr, { backgroundColor: Colors[colorScheme].border }]} />
+
+                            <Button label="Ya tengo cuenta" variant="secondary" onPress={() => goTo('/(auth)')} />
+                        </GlassSurface>
+                    </Animated.View>
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -267,60 +203,58 @@ export default function Register() {
 const styles = StyleSheet.create({
     page: {
         flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: Spacing.lg,
+        paddingVertical: Spacing.xl,
     },
     container: {
-        width: '90%',
-        marginVertical: 20,
-        borderRadius: 20,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 5,
+        padding: Spacing.xl,
+        gap: Spacing.md,
     },
     imageContainer: {
         width: '100%',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: Spacing.sm,
     },
     image: {
-        width: 100,
-        height: 100,
+        width: 88,
+        height: 88,
+        borderRadius: Radius.pill,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
+        ...Typography.display,
+        fontSize: 26,
         textAlign: 'center',
-        marginBottom: 10,
     },
     span: {
+        ...Typography.small,
         textAlign: 'center',
-        marginBottom: 20,
+        marginBottom: Spacing.sm,
     },
     input: {
-        paddingHorizontal: 12,
-        paddingVertical: 15,
-        borderRadius: 10,
-        marginBottom: 15,
+        ...Typography.body,
+        paddingHorizontal: Spacing.base,
+        paddingVertical: Spacing.md,
+        borderRadius: Radius.md,
+        borderWidth: StyleSheet.hairlineWidth,
     },
     sectionTitle: {
-        fontWeight: 'bold',
-        marginVertical: 10,
+        ...Typography.small,
+        fontWeight: '700',
+        marginTop: Spacing.sm,
     },
     profileScroll: {
-        // marginBottom: 20,
+        marginBottom: Spacing.sm,
     },
     profileOption: {
-        marginRight: 10,
+        marginRight: Spacing.sm,
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: Radius.pill,
         borderWidth: 2,
-        borderColor: 'transparent',
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
@@ -330,57 +264,8 @@ const styles = StyleSheet.create({
         height: '100%',
         resizeMode: 'cover',
     },
-    primary: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 15,
-        borderRadius: 10,
-        marginBottom: 5,
-        borderTopWidth: 2,
-        borderLeftWidth: 0.5,
-        borderRightWidth: 0.5,
-    },
-    textPrimary: {},
     hr: {
-        height: 1,
-        marginVertical: 20,
+        height: StyleSheet.hairlineWidth,
+        marginVertical: Spacing.sm,
     },
-    secondary: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 15,
-        borderRadius: 10,
-        borderTopWidth: 2,
-        borderLeftWidth: 0.5,
-        borderRightWidth: 0.5,
-        marginBottom: 25,
-    },
-    textSecondary: {},
-    dropdownButton: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: 300,
-        height: 50,
-        borderRadius: 10,
-        borderWidth: 1,
-        paddingHorizontal: 15
-    },
-    dropdownButtonText: {
-        flex: 1,
-        // fontSize: 16
-    },
-    dropdown: {
-        borderRadius: 10,
-        borderWidth: 1,
-        marginTop: 5
-    },
-    dropdownItem: {
-        padding: 15,
-        height: 50,
-        justifyContent: 'center'
-    },
-    dropdownItemText: {
-        // fontSize: 16
-    }
 })

@@ -1,5 +1,6 @@
 import { Alert, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native'
 import { Colors } from '@/constants/Colors'
+import { Radius, Spacing, Typography } from '@/constants/Theme'
 import { API_URL } from '@/constants/config'
 import { User } from '@/lib/interfaces'
 
@@ -17,11 +18,15 @@ export default function NewEnrollmentForm({topicId, setTopicId}: NewEnrollmentFo
                 Ingresa el ID del tema para inscribirte:
             </Text>
             <TextInput
-                style={[styles.input, {color: Colors[theme].text, borderColor: Colors[theme].border}]}
+                style={[styles.input, {
+                    color: Colors[theme].text,
+                    backgroundColor: Colors[theme].input,
+                    borderColor: Colors[theme].border,
+                }]}
                 placeholder="ID del tema"
+                placeholderTextColor={Colors[theme].textSecondary}
                 value={topicId}
                 onChangeText={setTopicId}
-                // keyboardType="numeric"
             />
             <Text style={[styles.enrollmentHelp, {color: Colors[theme].textSecondary || Colors[theme].text}]}>
                 Ingresa solamente el número ID del tema compartido por tu profesor.
@@ -82,16 +87,18 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     form: {
-        marginBottom: 20,
+        marginBottom: Spacing.lg,
     },
     label: {
-        marginBottom: 8,
+        ...Typography.small,
+        marginBottom: Spacing.sm,
     },
     input: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 16,
+        ...Typography.body,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: Radius.md,
+        padding: Spacing.base,
+        marginBottom: Spacing.sm,
     },
     textarea: {
         borderWidth: 1,
@@ -120,9 +127,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     enrollmentHelp: {
-        fontSize: 12,
-        marginTop: -12,
-        marginBottom: 16,
+        ...Typography.label,
+        fontWeight: '400',
+        textTransform: 'none',
+        marginBottom: Spacing.sm,
     },
     topicDetails: {
         padding: 10,

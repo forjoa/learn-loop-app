@@ -1,7 +1,11 @@
-import React from 'react'
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native'
+import React, { useEffect } from 'react'
+import { Modal, View, Text, StyleSheet } from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import { BlurView } from 'expo-blur'
 import { Colors } from '@/constants/Colors'
+import { GlassSurface } from './glass-view'
+import { Button } from './button'
+import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
 
 interface CustomAlertProps {
     visible: boolean;
@@ -29,6 +33,23 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                                                      theme = 'light',
                                                  }) => {
     const currentColors = Colors[theme]
+    const scale = useSharedValue(0.9)
+    const opacity = useSharedValue(0)
+
+    useEffect(() => {
+        if (visible) {
+            scale.value = withSpring(1, Motion.spring)
+            opacity.value = withTiming(1, { duration: Motion.durationFast })
+        } else {
+            scale.value = 0.9
+            opacity.value = 0
+        }
+    }, [visible])
+
+    const cardStyle = useAnimatedStyle(() => ({
+        opacity: opacity.value,
+        transform: [{ scale: scale.value }],
+    }))
 
     return (
         <Modal
@@ -38,67 +59,31 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
             onRequestClose={onCancel}
         >
             <BlurView
-                intensity={Platform.OS === 'ios' ? 30 : 20}
-                tint={theme === 'dark' ? 'dark' : 'light'}
+                intensity={30}
+                tint={theme}
                 style={[StyleSheet.absoluteFill, {backgroundColor: currentColors.backdrop}]}
             >
                 <View style={styles.centeredView}>
-                    <View style={[styles.alertContainer, {backgroundColor: currentColors.card}]}>
-                        <Text style={[styles.title, {color: currentColors.text}]}>{title}</Text>
-                        <Text style={[styles.message, {color: currentColors.textSecondary}]}>{message}</Text>
+                    <Animated.View style={[styles.alertWrapper, cardStyle]}>
+                        <GlassSurface tint={theme} radius={Radius.xl} style={styles.alertContainer}>
+                            <Text style={[styles.title, {color: currentColors.text}]}>{title}</Text>
+                            <Text style={[styles.message, {color: currentColors.textSecondary}]}>{message}</Text>
 
-                        <View style={styles.buttonsContainer}>
-                            <TouchableOpacity
-                                style={[
-                                    styles.button,
-                                    {
-                                        backgroundColor: currentColors.nav.background,
-                                        borderWidth: 1,
-                                        borderColor: currentColors.nav.border
-                                    }
-                                ]}
-                                onPress={onCancel}
-                            >
-                                <Text style={[styles.buttonText, {color: currentColors.text}]}>
-                                    {cancelText}
-                                </Text>
-                            </TouchableOpacity>
+                            <View style={styles.buttonsContainer}>
+                                <Button label={cancelText} variant="secondary" onPress={onCancel ?? (() => {})} />
 
-                            {onDeny && (
-                                <TouchableOpacity
-                                    style={[
-                                        styles.button,
-                                        {
-                                            backgroundColor: currentColors.error,
-                                            borderWidth: 1,
-                                            borderColor: currentColors.errorBorder,
-                                        }
-                                    ]}
-                                    onPress={onDeny}
-                                >
-                                    <Text style={[styles.buttonText, {
-                                        color: currentColors.text
-                                    }]}>{denyText}</Text>
-                                </TouchableOpacity>
-                            )}
+                                {onDeny && (
+                                    <Button
+                                        label={denyText}
+                                        onPress={onDeny}
+                                        style={{ backgroundColor: currentColors.error }}
+                                    />
+                                )}
 
-                            <TouchableOpacity
-                                style={[
-                                    styles.button,
-                                    {
-                                        backgroundColor: currentColors.primary,
-                                        borderWidth: 1,
-                                        borderColor: currentColors.primaryBorder
-                                    }
-                                ]}
-                                onPress={onConfirm}
-                            >
-                                <Text style={[styles.buttonText, {
-                                    color: currentColors.text
-                                }]}>{confirmText}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                                <Button label={confirmText} onPress={onConfirm ?? (() => {})} />
+                            </View>
+                        </GlassSurface>
+                    </Animated.View>
                 </View>
             </BlurView>
         </Modal>
@@ -110,43 +95,26 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: Spacing.lg,
+    },
+    alertWrapper: {
+        width: '100%',
     },
     alertContainer: {
-        width: '100%',
-        borderRadius: 12,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
+        padding: Spacing.lg,
     },
     title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 8,
+        ...Typography.title,
+        marginBottom: Spacing.xs,
         textAlign: 'center',
     },
     message: {
-        fontSize: 16,
-        marginBottom: 20,
+        ...Typography.body,
+        marginBottom: Spacing.lg,
         textAlign: 'center',
     },
     buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    button: {
-        borderRadius: 8,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        elevation: 2,
-        minWidth: 100,
-        alignItems: 'center',
-    },
-    buttonText: {
-        fontSize: 14,
+        gap: Spacing.sm,
     },
 })
 

@@ -1,5 +1,6 @@
 import { ReactNode, useCallback, useState } from 'react'
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
+import { Spacing } from '@/constants/Theme'
 
 export default function Main({children, onLoad}: { children: ReactNode, onLoad: () => Promise<void> }) {
     const [refreshing, setRefreshing] = useState(false)
@@ -35,7 +36,7 @@ export default function Main({children, onLoad}: { children: ReactNode, onLoad: 
 const styles = StyleSheet.create({
     titleContainer: {
         flex: 1,
-        padding: 18,
+        padding: Spacing.base,
         width: '100%',
     },
     scrollView: {

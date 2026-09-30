@@ -9,9 +9,12 @@ import {
     Text,
     View
 } from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import BottomSheet from '@/components/ui/bottom-sheet'
 import { Colors } from '@/constants/Colors'
+import { Motion, Spacing, Typography } from '@/constants/Theme'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import * as Haptics from 'expo-haptics'
 
 type SelectEditPhotoProps = {
     isVisible: boolean
@@ -20,6 +23,33 @@ type SelectEditPhotoProps = {
     currentPhoto?: string
     setProfilePhoto: Dispatch<SetStateAction<string | undefined>>
     photos: Record<string, ImageSourcePropType>
+}
+
+function PhotoOption({ source, size, isActive, onPress, tint }: { source: ImageSourcePropType, size: number, isActive: boolean, onPress: () => void, tint: 'light' | 'dark' }) {
+    const scale = useSharedValue(isActive ? 1.05 : 1)
+
+    useEffect(() => {
+        scale.value = withSpring(isActive ? 1.05 : 1, Motion.spring)
+    }, [isActive])
+
+    const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }))
+
+    return (
+        <Animated.View style={animatedStyle}>
+            <Pressable
+                onPress={onPress}
+                style={[
+                    styles.item,
+                    { width: size, height: size, borderColor: isActive ? Colors[tint].primary : 'transparent' },
+                ]}
+            >
+                <Image
+                    source={source}
+                    style={[styles.image, { width: size - 8, height: size - 8, borderRadius: (size - 8) / 2 }]}
+                />
+            </Pressable>
+        </Animated.View>
+    )
 }
 
 export default function SelectEditPhoto({
@@ -43,6 +73,7 @@ export default function SelectEditPhoto({
     const ITEM_SIZE = (width - 40 - 20) / 3
 
     const handleSelectPhoto = (key: string) => {
+        Haptics.selectionAsync()
         setSelected(key)
         setProfilePhoto(key)
     }
@@ -59,37 +90,16 @@ export default function SelectEditPhoto({
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.grid}
                     >
-                        {photoList.map(({key, source}) => {
-                            const isActive = key === selected
-                            return (
-                                <Pressable
-                                    key={key}
-                                    onPress={() => handleSelectPhoto(key)}
-                                    style={[
-                                        styles.item,
-                                        {
-                                            width: ITEM_SIZE,
-                                            height: ITEM_SIZE,
-                                            borderColor: isActive
-                                                ? Colors[theme].primary
-                                                : 'transparent',
-                                        },
-                                    ]}
-                                >
-                                    <Image
-                                        source={source}
-                                        style={[
-                                            styles.image,
-                                            {
-                                                width: ITEM_SIZE - 8,
-                                                height: ITEM_SIZE - 8,
-                                                borderRadius: (ITEM_SIZE - 8) / 2,
-                                            },
-                                        ]}
-                                    />
-                                </Pressable>
-                            )
-                        })}
+                        {photoList.map(({key, source}) => (
+                            <PhotoOption
+                                key={key}
+                                source={source}
+                                size={ITEM_SIZE}
+                                isActive={key === selected}
+                                onPress={() => handleSelectPhoto(key)}
+                                tint={theme}
+                            />
+                        ))}
                     </ScrollView>
                 </View>
             </View>
@@ -103,9 +113,8 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        ...Typography.title,
+        marginBottom: Spacing.lg,
         textAlign: 'center',
     },
     scrollContainer: {
@@ -116,11 +125,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        paddingHorizontal: 10,
-        paddingBottom: 20,
+        paddingHorizontal: Spacing.md,
+        paddingBottom: Spacing.lg,
     },
     item: {
-        marginBottom: 10,
+        marginBottom: Spacing.md,
         borderWidth: 2,
         borderRadius: 100,
         justifyContent: 'center',

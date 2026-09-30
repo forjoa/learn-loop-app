@@ -2,14 +2,19 @@ import {
     StyleSheet,
     Text,
     View,
-    TouchableOpacity,
+    Pressable,
     ScrollView,
     ActivityIndicator,
     Alert,
     ColorSchemeName,
+    LayoutChangeEvent,
 } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { Colors } from '@/constants/Colors'
+import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
+import { GlassSurface } from '@/components/ui/glass-view'
+import { Button } from '@/components/ui/button'
 import BottomSheet from '@/components/ui/bottom-sheet'
 import { useAuth } from '@/hooks/useAuth'
 import * as SecureStore from 'expo-secure-store'
@@ -26,6 +31,8 @@ type NewBottomSheetProps = {
     colorScheme?: ColorSchemeName
 }
 
+type FormType = 'topic' | 'post' | 'enrollment'
+
 export default function NewContent({
                                        isVisible,
                                        onClose,
@@ -34,7 +41,7 @@ export default function NewContent({
     const theme = colorScheme === 'light' ? 'light' : 'dark'
     const {user} = useAuth()
 
-    const [formType, setFormType] = useState<'topic' | 'post' | 'enrollment'>('enrollment')
+    const [formType, setFormType] = useState<FormType>('enrollment')
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [content, setContent] = useState('')
@@ -48,6 +55,32 @@ export default function NewContent({
     const [selectedDocument, setSelectedDocument] = useState<DocumentPicker.DocumentPickerAsset | null>(null)
 
     const isTeacher = user?.role === 'TEACHER'
+
+    const tabLayouts = useRef<Record<FormType, { x: number, width: number }>>({} as any)
+    const indicatorX = useSharedValue(0)
+    const indicatorWidth = useSharedValue(0)
+
+    const indicatorStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: indicatorX.value }],
+        width: indicatorWidth.value,
+    }))
+
+    const moveIndicatorTo = (type: FormType) => {
+        const layout = tabLayouts.current[type]
+        if (layout) {
+            indicatorX.value = withSpring(layout.x, Motion.springSoft)
+            indicatorWidth.value = withSpring(layout.width, Motion.springSoft)
+        }
+    }
+
+    const onTabLayout = (type: FormType) => (e: LayoutChangeEvent) => {
+        const { x, width } = e.nativeEvent.layout
+        tabLayouts.current[type] = { x, width }
+        if (type === formType) {
+            indicatorX.value = x
+            indicatorWidth.value = width
+        }
+    }
 
     useEffect(() => {
         const loadToken = async () => {
@@ -97,7 +130,7 @@ export default function NewContent({
                 const successResult = result as DocumentPicker.DocumentPickerSuccessResult
 
                 setSelectedDocument(successResult.assets[0])
-            } 
+            }
         } catch (error) {
             console.error('Error picking documents:', error)
         }
@@ -146,47 +179,29 @@ export default function NewContent({
         }
     }
 
+    const renderTab = (type: FormType, label: string) => (
+        <Pressable
+            style={styles.tab}
+            onLayout={onTabLayout(type)}
+            onPress={() => {
+                setFormType(type)
+                moveIndicatorTo(type)
+                if (type === 'post') fetchTopicsByOwner()
+            }}
+        >
+            <Text
+                style={[styles.tabText, {color: formType === type ? '#fff' : Colors[theme].textSecondary}]}>
+                {label}
+            </Text>
+        </Pressable>
+    )
+
     const renderTeacherTabs = () => (
-        <View style={styles.tabs}>
-            <TouchableOpacity
-                style={[
-                    styles.tab,
-                    formType === 'topic' && {borderBottomColor: Colors[theme].primary, borderBottomWidth: 2}
-                ]}
-                onPress={() => setFormType('topic')}
-            >
-                <Text
-                    style={[styles.tabText, {color: formType === 'topic' ? Colors[theme].primary : Colors[theme].text}]}>
-                    Nuevo Tema
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[
-                    styles.tab,
-                    formType === 'post' && {borderBottomColor: Colors[theme].primary, borderBottomWidth: 2}
-                ]}
-                onPress={() => {
-                    setFormType('post')
-                    fetchTopicsByOwner()
-                }}
-            >
-                <Text
-                    style={[styles.tabText, {color: formType === 'post' ? Colors[theme].primary : Colors[theme].text}]}>
-                    Nuevo Post
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[
-                    styles.tab,
-                    formType === 'enrollment' && {borderBottomColor: Colors[theme].primary, borderBottomWidth: 2}
-                ]}
-                onPress={() => setFormType('enrollment')}
-            >
-                <Text
-                    style={[styles.tabText, {color: formType === 'enrollment' ? Colors[theme].primary : Colors[theme].text}]}>
-                    Ingresar a un tema
-                </Text>
-            </TouchableOpacity>
+        <View style={[styles.tabsRow, { backgroundColor: Colors[theme].input }]}>
+            <Animated.View style={[styles.indicator, indicatorStyle, { backgroundColor: Colors[theme].primary }]} />
+            {renderTab('topic', 'Nuevo tema')}
+            {renderTab('post', 'Nuevo post')}
+            {renderTab('enrollment', 'Ingresar')}
         </View>
     )
 
@@ -251,30 +266,19 @@ export default function NewContent({
                     />
                 )}
 
-                <TouchableOpacity
-                    style={[
-                        styles.button,
-                        {
-                            backgroundColor: Colors[theme].primary,
-                            borderColor: Colors[theme].primaryBorder
-                        },
-                        (loadingTopics || loading) && {opacity: 0.7}
-                    ]}
+                <Button
+                    label={
+                        isTeacher
+                            ? formType === 'topic'
+                                ? 'Crear tema'
+                                : formType === 'enrollment' ? 'Solicitar' : 'Crear post'
+                            : 'Enviar solicitud'
+                    }
                     onPress={handleSubmit}
-                    disabled={loadingTopics || loading}
-                >
-                    {loading ? (
-                        <ActivityIndicator size="small" color="#FFFFFF"/>
-                    ) : (
-                        <Text style={styles.buttonText}>
-                            {isTeacher
-                                ? formType === 'topic'
-                                    ? 'Crear Tema'
-                                    : formType === 'enrollment' ? 'Solicitar' : 'Crear Post'
-                                : 'Enviar Solicitud'}
-                        </Text>
-                    )}
-                </TouchableOpacity>
+                    loading={loading}
+                    disabled={loadingTopics}
+                    style={{ marginTop: Spacing.md }}
+                />
             </ScrollView>
         </BottomSheet>
     )
@@ -282,37 +286,34 @@ export default function NewContent({
 
 const styles = StyleSheet.create({
     container: {
-        paddingBottom: 20,
+        paddingBottom: Spacing.lg,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        ...Typography.title,
+        marginBottom: Spacing.lg,
     },
-    tabs: {
+    tabsRow: {
         flexDirection: 'row',
-        marginBottom: 20,
+        marginBottom: Spacing.lg,
+        borderRadius: Radius.pill,
+        padding: 4,
+        position: 'relative',
+    },
+    indicator: {
+        position: 'absolute',
+        top: 4,
+        bottom: 4,
+        left: 0,
+        borderRadius: Radius.pill,
     },
     tab: {
         flex: 1,
-        paddingVertical: 10,
+        paddingVertical: Spacing.sm,
         alignItems: 'center',
+        zIndex: 1,
     },
     tabText: {
-        fontWeight: '500',
-    },
-    button: {
-        padding: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 10,
-        borderRadius: 10,
-        borderTopWidth: 2,
-        borderLeftWidth: 0.5,
-        borderRightWidth: 0.5,
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontWeight: 'bold',
+        ...Typography.small,
+        fontWeight: '600',
     },
 })

@@ -8,11 +8,11 @@ import {
     useColorScheme,
     View
 } from 'react-native'
+import { Picker } from '@expo/ui'
 import { Colors } from '@/constants/Colors'
-import SelectDropdown from 'react-native-select-dropdown'
-import { MaterialIcons } from '@expo/vector-icons'
 import Feather from '@expo/vector-icons/Feather'
 import { Topic, User } from '@/lib/interfaces'
+import { Radius, Spacing, Typography } from '@/constants/Theme'
 import { env } from '@/lib/environment'
 import { API_URL } from '@/constants/config'
 import * as DocumentPicker from 'expo-document-picker'
@@ -61,76 +61,44 @@ export default function NewPostForm({
                 <Text style={{color: Colors[theme].text}}>No hay temas disponibles</Text>
             ) : (
                 <>
-                    <View>
-                        <SelectDropdown
-                            data={topicsByOwner}
-                            defaultValue={selectedTopic}
-                            onSelect={(selectedItem) => {
-                                setSelectedTopicId(selectedItem.id)
-                                setSelectedTopic(selectedItem)
-                            }}
-                            renderButton={(selectedItem, isOpened) => (
-                                <View style={[
-                                    styles.dropdownButton,
-                                    {
-                                        backgroundColor: Colors[theme].input || 'transparent',
-                                        borderColor: Colors[theme].border
-                                    }
-                                ]}>
-                                    <Text style={[
-                                        styles.dropdownButtonText,
-                                        {
-                                            color: Colors[theme].text,
-                                        }
-                                    ]}>
-                                        {selectedItem?.title || 'Seleccionar tema'}
-                                    </Text>
-                                    <MaterialIcons
-                                        name={isOpened ? 'arrow-drop-up' : 'arrow-drop-down'}
-                                        size={24}
-                                        color={Colors[theme].text}
-                                    />
-                                </View>
-                            )}
-                            renderItem={(item, index, isSelected) => (
-                                <View style={[
-                                    styles.dropdownItem,
-                                    isSelected && {
-                                        backgroundColor: Colors[theme].primary + '20'
-                                    },
-                                    {
-                                        backgroundColor: Colors[theme].input || 'transparent',
-                                    }
-                                ]}>
-                                    <Text style={[
-                                        styles.dropdownItemText,
-                                        {
-                                            color: Colors[theme].text,
-                                        }
-                                    ]}>
-                                        {item.title}
-                                    </Text>
-                                </View>
-                            )}
-                            dropdownStyle={[
-                                styles.dropdown,
-                                {
-                                    backgroundColor: Colors[theme].input || 'transparent',
-                                    borderColor: Colors[theme].border,
-                                    marginTop: 5
+                    <View style={[styles.pickerWrapper, {
+                        backgroundColor: Colors[theme].input,
+                        borderColor: Colors[theme].border,
+                    }]}>
+                        <Picker
+                            selectedValue={selectedTopic?.id ?? topicsByOwner[0]?.id}
+                            onValueChange={(topicId) => {
+                                const topic = topicsByOwner.find((t) => t.id === topicId)
+                                if (topic) {
+                                    setSelectedTopicId(topic.id)
+                                    setSelectedTopic(topic)
                                 }
-                            ]}
-                        />
+                            }}
+                        >
+                            {topicsByOwner.map((topic) => (
+                                <Picker.Item key={topic.id} label={topic.title} value={topic.id} />
+                            ))}
+                        </Picker>
                     </View>
                     <TextInput
-                        style={[styles.input, {color: Colors[theme].text, borderColor: Colors[theme].border}]}
+                        style={[styles.input, {
+                            color: Colors[theme].text,
+                            backgroundColor: Colors[theme].input,
+                            borderColor: Colors[theme].border,
+                        }]}
                         placeholder="Título del post"
+                        placeholderTextColor={Colors[theme].textSecondary}
                         value={title}
                         onChangeText={setTitle}
                     />
                     <TextInput
-                        style={[styles.textarea, {color: Colors[theme].text, borderColor: Colors[theme].border}]}
+                        style={[styles.textarea, {
+                            color: Colors[theme].text,
+                            backgroundColor: Colors[theme].input,
+                            borderColor: Colors[theme].border,
+                        }]}
                         placeholder="Contenido del post"
+                        placeholderTextColor={Colors[theme].textSecondary}
                         value={content}
                         onChangeText={setContent}
                         multiline
@@ -246,70 +214,56 @@ export const createPost = async (title: string, content: string, selectedTopicId
 
 const styles = StyleSheet.create({
     form: {
-        marginBottom: 20,
+        marginBottom: Spacing.lg,
+        gap: Spacing.sm,
     },
     label: {
-        marginBottom: 8,
+        marginBottom: Spacing.sm,
     },
     input: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 16,
+        ...Typography.body,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: Radius.md,
+        padding: Spacing.base,
     },
     textarea: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 16,
+        ...Typography.body,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: Radius.md,
+        padding: Spacing.base,
         textAlignVertical: 'top',
     },
-    dropdownButton: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: 50,
-        borderRadius: 8,
-        borderWidth: 1,
-        paddingHorizontal: 15,
-        marginBottom: 16,
-    },
-    dropdownButtonText: {
-        flex: 1,
-    },
-    dropdown: {
-        borderRadius: 8,
-        borderWidth: 1,
-    },
-    dropdownItem: {
-        padding: 15,
-        height: 50,
+    pickerWrapper: {
+        minHeight: 52,
+        borderRadius: Radius.md,
+        borderWidth: StyleSheet.hairlineWidth,
+        overflow: 'hidden',
         justifyContent: 'center',
+        paddingHorizontal: Spacing.sm,
     },
     selectFile: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: 5,
-        height: 50,
-        borderRadius: 8,
-        borderWidth: 1,
-        paddingHorizontal: 15,
+        gap: Spacing.xs,
+        height: 52,
+        borderRadius: Radius.md,
+        borderWidth: StyleSheet.hairlineWidth,
+        paddingHorizontal: Spacing.base,
     },
-    dropdownItemText: {},
     fileContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        padding: 10,
-        borderRadius: 10,
-        borderWidth: 1
+        gap: Spacing.sm,
+        padding: Spacing.md,
+        borderRadius: Radius.md,
+        borderWidth: StyleSheet.hairlineWidth,
     },
     typeContainer: {
-        paddingHorizontal: 7,
-        paddingVertical: 9,
-        borderRadius: 5,
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: Spacing.sm,
+        borderRadius: Radius.xs,
     }
 })

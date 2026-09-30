@@ -1,11 +1,13 @@
 import { Colors } from '@/constants/Colors'
+import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
+import { GlassSurface } from './ui/glass-view'
+import { Button } from './ui/button'
 import React, { useState } from 'react'
 import {
     ActivityIndicator,
     Alert,
   Image,
   Modal,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,8 +23,8 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated'
+import * as Haptics from 'expo-haptics'
 import BottomSheet from './ui/bottom-sheet'
-import { BlurView } from 'expo-blur'
 import * as Clipboard from 'expo-clipboard';
 
 interface FloatingButtonProps extends ViewProps {
@@ -47,7 +49,7 @@ export function FloatingButton({
     return {
       transform: [
         {
-          rotate: withSpring(isOpen ? '360deg' : '0deg'),
+          rotate: withSpring(isOpen ? '360deg' : '0deg', Motion.spring),
         },
       ],
     }
@@ -64,10 +66,10 @@ export function FloatingButton({
     return {
       transform: [
         {
-          scale: withSpring(animation.value),
+          scale: withSpring(animation.value, Motion.spring),
         },
         {
-          translateY: withSpring(translateYAnimation),
+          translateY: withSpring(translateYAnimation, Motion.spring),
         },
       ],
     }
@@ -82,7 +84,7 @@ export function FloatingButton({
     )
 
     return {
-      opacity: withSpring(opacityAnimation),
+      opacity: withSpring(opacityAnimation, Motion.spring),
     }
   })
 
@@ -95,6 +97,7 @@ export function FloatingButton({
   }
 
     const generateExam = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
     setIsOpen(false)
     animation.value = 0
     setIsLoading(true)
@@ -158,14 +161,12 @@ export function FloatingButton({
         transparent={true}
         animationType="fade"
       >
-        <BlurView intensity={Platform.OS === 'ios' ? 30 : 20}
-                        tint={colorScheme === 'dark' ? 'dark' : 'light'}
-                        style={[StyleSheet.absoluteFill, {backgroundColor: Colors[colorScheme].backdrop}]}>
-          <View style={styles.loadingContent}>
-            <ActivityIndicator size="large" color="#016BFF" />
-            <Text style={styles.loadingText}>Generando examen...</Text>
-          </View>
-        </BlurView>
+        <View style={[StyleSheet.absoluteFill, styles.loadingBackdrop, {backgroundColor: Colors[colorScheme].backdrop}]}>
+          <GlassSurface tint={colorScheme} radius={Radius.xl} style={styles.loadingCard}>
+            <ActivityIndicator size="large" color={Colors[colorScheme].primary} />
+            <Text style={[styles.loadingText, { color: Colors[colorScheme].text }]}>Generando examen...</Text>
+          </GlassSurface>
+        </View>
       </Modal>
 
       <BottomSheet
@@ -182,17 +183,13 @@ export function FloatingButton({
               {examData}
             </Text>
           </ScrollView>
-          <TouchableOpacity
-            style={styles.copyButton}
+          <Button
+            label="Copiar al portapapeles"
             onPress={async () => {
-              // Aquí puedes implementar la funcionalidad de copiar
-              
-               await Clipboard.setStringAsync(examData)
+              await Clipboard.setStringAsync(examData)
               Alert.alert('Copiado', 'Examen copiado al portapapeles')
             }}
-          >
-            <Text style={styles.copyButtonText}>Copiar al portapapeles</Text>
-          </TouchableOpacity>
+          />
         </View>
       </BottomSheet>
     </>
@@ -207,7 +204,7 @@ const styles = StyleSheet.create({
   button: {
     width: 65,
     height: 65,
-    borderRadius: 40,
+    borderRadius: Radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#016BFF',
@@ -217,57 +214,39 @@ const styles = StyleSheet.create({
     height: 40,
   },
   option: {
-    padding: 10,
+    padding: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: Radius.md,
     marginBottom: -20
   },
-  loadingContainer: {
-    flex: 1,
+  loadingBackdrop: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(1, 107, 255, 0.1)',
   },
-  loadingContent: {
+  loadingCard: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    padding: 20,
+    padding: Spacing.xl,
+    gap: Spacing.md,
   },
   loadingText: {
-    marginTop: 15,
-    fontSize: 16,
-    color: '#016BFF',
-    fontWeight: '600',
+    ...Typography.bodyStrong,
   },
   bottomSheetContent: {
-    padding: 20,
+    padding: Spacing.lg,
     maxHeight: '80%',
+    gap: Spacing.md,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
+    ...Typography.title,
     textAlign: 'center',
   },
   scrollContainer: {
     maxHeight: 400,
-    marginBottom: 20,
   },
   examText: {
     fontSize: 14,
     lineHeight: 20,
     fontFamily: 'monospace',
-  },
-  copyButton: {
-    backgroundColor: '#016BFF',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  copyButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
   },
 })

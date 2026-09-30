@@ -1,20 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   TextInput,
   View,
   Text,
   StyleSheet,
   Image,
-  Pressable,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
   useColorScheme,
 } from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming, Easing } from 'react-native-reanimated'
 import { useAuth } from '@/hooks/useAuth'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Href, router } from 'expo-router'
 import { Colors } from '@/constants/Colors'
+import { GlassSurface } from '@/components/ui/glass-view'
+import { Button } from '@/components/ui/button'
+import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -22,6 +24,15 @@ export default function Login() {
   const { login, loading } = useAuth()
   const [loginError, setLoginError] = useState<string | null>(null)
   const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
+
+  const entrance = useSharedValue(0)
+  useEffect(() => {
+    entrance.value = withDelay(80, withTiming(1, { duration: Motion.durationSlow, easing: Easing.out(Easing.cubic) }))
+  }, [])
+  const entranceStyle = useAnimatedStyle(() => ({
+    opacity: entrance.value,
+    transform: [{ translateY: (1 - entrance.value) * 24 }],
+  }))
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -38,110 +49,73 @@ export default function Login() {
   }
 
   const goTo = (route: Href) => {
-    router.push(route)
+    if (router.canGoBack()) {
+      router.back()
+    } else {
+      router.push(route)
+    }
   }
 
   return (
-    <SafeAreaView style={styles.page}>
+    <SafeAreaView style={[styles.page, { backgroundColor: Colors[colorScheme].background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={[
-          styles.container,
-          { backgroundColor: Colors[colorScheme].nav.background }
-        ]}
+        style={styles.page}
       >
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.image}
-            source={require('@/assets/images/droid.png')}
-          />
-        </View>
-        <Text style={[
-          styles.title,
-          { color: Colors[colorScheme].text }
-        ]}>Login</Text>
-        <Text style={[
-          styles.span,
-          { color: Colors[colorScheme].textSecondary }
-        ]}>
-          Bienvenido de nuevo a tu plataforma de aprendizaje favorita
-        </Text>
-        <TextInput
-          style={[
-            styles.input,
-            { 
-              backgroundColor: Colors[colorScheme].input,
-              color: Colors[colorScheme].text 
-            }
-          ]}
-          placeholder="Email"
-          placeholderTextColor={Colors[colorScheme].textSecondary}
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={[
-            styles.input,
-            { 
-              backgroundColor: Colors[colorScheme].input,
-              color: Colors[colorScheme].text 
-            }
-          ]}
-          placeholder="******"
-          placeholderTextColor={Colors[colorScheme].textSecondary}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        {loginError && (
-          <Text style={[
-            styles.errorText,
-            { color: Colors[colorScheme].error }
-          ]}>{loginError}</Text>
-        )}
-        <Pressable 
-          style={[
-            styles.primary, 
-            { 
-              backgroundColor: Colors[colorScheme].primary,
-              borderColor: Colors[colorScheme].primaryBorder 
-            },
-            loading && [
-              styles.disabledButton,
-              { backgroundColor: Colors[colorScheme].disabledButton }
-            ]
-          ]} 
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color={Colors[colorScheme].text} />
-          ) : (
-            <Text style={[
-              styles.textPrimary,
-              { color: '#fff' }
-            ]}>Enviar</Text>
-          )}
-        </Pressable>
-        <View style={[
-          styles.hr,
-          { backgroundColor: Colors[colorScheme].border }
-        ]} />
-        <Pressable
-          style={[
-            styles.secondary,
-            { 
-              backgroundColor: Colors[colorScheme].secondary.background,
-              borderColor: Colors[colorScheme].secondary.border 
-            }
-          ]}
-          onPress={() => goTo('/(auth)/register')}
-        >
-          <Text style={[
-            styles.textSecondary,
-            { color: Colors[colorScheme].secondary.text }
-          ]}>Regístrate</Text>
-        </Pressable>
+        <Animated.View style={[styles.wrapper, entranceStyle]}>
+          <GlassSurface tint={colorScheme} radius={Radius.xxl} style={styles.container}>
+            <View style={styles.imageContainer}>
+              <Image
+                style={styles.image}
+                source={require('@/assets/images/droid.png')}
+              />
+            </View>
+            <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Bienvenido</Text>
+            <Text style={[styles.span, { color: Colors[colorScheme].textSecondary }]}>
+              Inicia sesión en tu plataforma de aprendizaje favorita
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: Colors[colorScheme].input,
+                  color: Colors[colorScheme].text,
+                  borderColor: Colors[colorScheme].border,
+                },
+              ]}
+              placeholder="Email"
+              placeholderTextColor={Colors[colorScheme].textSecondary}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+            />
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: Colors[colorScheme].input,
+                  color: Colors[colorScheme].text,
+                  borderColor: Colors[colorScheme].border,
+                },
+              ]}
+              placeholder="Contraseña"
+              placeholderTextColor={Colors[colorScheme].textSecondary}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+            {loginError && (
+              <Text style={[styles.errorText, { color: Colors[colorScheme].error }]}>{loginError}</Text>
+            )}
+            <Button label="Entrar" onPress={handleLogin} loading={loading} />
+            <View style={[styles.hr, { backgroundColor: Colors[colorScheme].border }]} />
+            <Button
+              label="Crear una cuenta"
+              variant="secondary"
+              onPress={() => goTo('/(auth)/register')}
+            />
+          </GlassSurface>
+        </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -149,75 +123,48 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   page: {
-    display: 'flex',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
+  },
+  wrapper: {
+    width: '88%',
   },
   errorText: {
-    fontSize: 14,
-    marginTop: -15,
-    marginBottom: -10,
-  },
-  disabledButton: {
-    opacity: 0.7,
+    ...Typography.small,
+    marginTop: -Spacing.sm,
   },
   container: {
-    width: '80%',
-    padding: 30,
-    borderRadius: 20,
-    display: 'flex',
-    gap: 25,
+    padding: Spacing.xl,
+    gap: Spacing.lg,
   },
   imageContainer: {
     width: '100%',
-    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 88,
+    height: 88,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: -20,
+    ...Typography.display,
+    fontSize: 28,
+    textAlign: 'center',
   },
   span: {
-    marginTop: -10,
+    ...Typography.small,
+    textAlign: 'center',
+    marginTop: -Spacing.sm,
   },
   input: {
-    paddingHorizontal: 12,
-    paddingVertical: 15,
-    borderRadius: 10,
-  },
-  primary: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderRadius: 10,
-    borderTopWidth: 2,
-    borderLeftWidth: 0.5,
-    borderRightWidth: 0.5,
-  },
-  textPrimary: {
+    ...Typography.body,
+    paddingHorizontal: Spacing.base,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   hr: {
-    height: 1,
-  },
-  secondary: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderRadius: 10,
-    borderTopWidth: 2,
-    borderLeftWidth: 0.5,
-    borderRightWidth: 0.5,
-    marginBottom: 25,
-  },
-  textSecondary: {
+    height: StyleSheet.hairlineWidth,
   },
 })

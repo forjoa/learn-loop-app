@@ -15,11 +15,14 @@ import {
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
-    withSpring,
     withTiming,
+    Easing,
     runOnJS,
 } from 'react-native-reanimated'
+import { BlurView } from 'expo-blur'
 import { Colors } from '@/constants/Colors'
+import { Radius, Spacing } from '@/constants/Theme'
+import { GlassSurface } from './glass-view'
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window')
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50
@@ -47,7 +50,7 @@ export default function BottomSheet({
         callback?: () => void
     ) => {
         'worklet'
-        translateY.value = withSpring(destination, {damping: 15})
+        translateY.value = withTiming(destination, {duration: 320, easing: Easing.out(Easing.cubic)})
         backdropOpacity.value = withTiming(
             destination === 0 ? 0 : 1,
             {duration: 300},
@@ -93,35 +96,32 @@ export default function BottomSheet({
     return (
         <Modal transparent visible={isVisible} animationType="none">
             <TouchableWithoutFeedback onPress={() => scrollTo(0, onClose)}>
-                <Animated.View
-                    style={[
-                        styles.backdrop,
-                        rBackdropStyle,
-                        {backgroundColor: Colors[theme].backdrop}
-                    ]}
-                />
+                <Animated.View style={[styles.backdrop, rBackdropStyle]}>
+                    <BlurView
+                        intensity={30}
+                        tint={theme}
+                        style={[StyleSheet.absoluteFill, {backgroundColor: Colors[theme].backdrop}]}
+                    />
+                </Animated.View>
             </TouchableWithoutFeedback>
 
             <GestureDetector gesture={gesture}>
-                <Animated.View
-                    style={[
-                        styles.sheet,
-                        rSheetStyle,
-                        {
-                            backgroundColor: Colors[theme].card,
-                            borderColor: Colors[theme].border
-                        }
-                    ]}
-                >
-                    <View
-                        style={[
-                            styles.line,
-                            {backgroundColor: Colors[theme].line}
-                        ]}
-                    />
-                    <SafeAreaView style={styles.content}>
-                        {children}
-                    </SafeAreaView>
+                <Animated.View style={[styles.sheetWrapper, rSheetStyle]}>
+                    <GlassSurface
+                        tint={theme}
+                        radius={0}
+                        style={[styles.sheet, {borderColor: Colors[theme].border}]}
+                    >
+                        <View
+                            style={[
+                                styles.line,
+                                {backgroundColor: Colors[theme].line}
+                            ]}
+                        />
+                        <SafeAreaView style={styles.content}>
+                            {children}
+                        </SafeAreaView>
+                    </GlassSurface>
                 </Animated.View>
             </GestureDetector>
         </Modal>
@@ -136,25 +136,28 @@ const styles = StyleSheet.create({
         height: '100%',
         zIndex: 1,
     },
-    sheet: {
+    sheetWrapper: {
         height: SCREEN_HEIGHT,
         width: '100%',
         position: 'absolute',
         top: SCREEN_HEIGHT,
-        borderTopLeftRadius: 25,
-        borderTopRightRadius: 25,
-        borderWidth: 1,
         zIndex: 20,
     },
+    sheet: {
+        flex: 1,
+        borderTopLeftRadius: Radius.xxl,
+        borderTopRightRadius: Radius.xxl,
+        borderWidth: StyleSheet.hairlineWidth,
+    },
     line: {
-        width: 75,
-        height: 4,
+        width: 48,
+        height: 5,
         alignSelf: 'center',
-        marginVertical: 15,
-        borderRadius: 2,
+        marginVertical: Spacing.md,
+        borderRadius: Radius.pill,
     },
     content: {
         flex: 1,
-        padding: 20,
+        padding: Spacing.lg,
     },
 })
