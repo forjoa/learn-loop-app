@@ -1,4 +1,4 @@
-import { useAuth } from '@/hooks/useAuth'
+import { AuthProvider, useAuth } from '@/hooks/useAuth'
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router/react-navigation'
 import { useFonts } from 'expo-font'
 import { Redirect, Stack } from 'expo-router'
@@ -14,6 +14,14 @@ import { ActivityIndicator, View } from 'react-native'
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+    return (
+        <AuthProvider>
+            <RootLayoutNav />
+        </AuthProvider>
+    )
+}
+
+function RootLayoutNav() {
     const [fontsLoaded] = useFonts({
         SpaceMono: require('../assets/fonts/Geist-Regular.ttf'),
     })
@@ -65,20 +73,20 @@ export default function RootLayout() {
         <GestureHandlerRootView style={styles.container}>
             <ThemeProvider value={theme}>
                 <Stack screenOptions={{ headerShown: false }}>
-                    {user ? (
-                        <>
-                            <Stack.Screen
-                                name="(tabs)"
-                                options={{ headerShown: false }}
-                            />
-                            <Stack.Screen name="+not-found"/>
-                        </>
-                    ) : (
+                    <Stack.Protected guard={!!user}>
+                        <Stack.Screen
+                            name="(tabs)"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen name="+not-found"/>
+                    </Stack.Protected>
+
+                    <Stack.Protected guard={!user}>
                         <Stack.Screen
                             name="(auth)"
                             options={{ headerShown: false }}
                         />
-                    )}
+                    </Stack.Protected>
                 </Stack>
                 <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'}/>
             </ThemeProvider>

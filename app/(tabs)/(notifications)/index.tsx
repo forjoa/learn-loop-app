@@ -1,7 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native'
+import { StyleSheet, Text, Pressable, useColorScheme, View } from 'react-native'
 
 import Main from '@/components/ui/main'
+import { GlassSurface } from '@/components/ui/glass-view'
+import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
 import { useEffect, useState } from 'react'
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming, Easing } from 'react-native-reanimated'
 import { API_URL } from '@/constants/config'
 import { useAuth } from '@/hooks/useAuth'
 import * as SecureStorage from 'expo-secure-store'
@@ -9,6 +12,51 @@ import { Colors } from '@/constants/Colors'
 import Feather from '@expo/vector-icons/Feather'
 import CustomAlert from '@/components/ui/dialog'
 import { Noti } from '@/lib/interfaces'
+
+function NotificationRow({ notif, theme, index, onPress }: { notif: Noti, theme: 'light' | 'dark', index: number, onPress: () => void }) {
+    const scale = useSharedValue(1)
+    const entrance = useSharedValue(0)
+
+    useEffect(() => {
+        entrance.value = withDelay(
+            Math.min(index, 8) * 50,
+            withTiming(1, { duration: Motion.durationBase, easing: Easing.out(Easing.cubic) })
+        )
+    }, [])
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: entrance.value,
+        transform: [
+            { translateY: (1 - entrance.value) * 12 },
+            { scale: scale.value },
+        ],
+    }))
+
+    return (
+        <Animated.View style={animatedStyle}>
+            <Pressable
+                onPressIn={() => { scale.value = withSpring(0.98, Motion.spring) }}
+                onPressOut={() => { scale.value = withSpring(1, Motion.spring) }}
+                onPress={onPress}
+            >
+                <GlassSurface tint={theme} radius={Radius.lg} style={styles.nav}>
+                    <View style={[styles.imageContainer, {backgroundColor: Colors[theme].primaryBackground}]}>
+                        <Feather name={notif.title.toLowerCase().includes('solicitud') ? 'users' : 'file-plus'}
+                                 color={Colors[theme].primary} size={26}/>
+                    </View>
+                    <View style={[styles.textContainer]}>
+                        <Text style={[Typography.bodyStrong, {color: Colors[theme].text}]}>
+                            {notif.content}
+                        </Text>
+                        <Text style={[Typography.small, {color: Colors[theme].textSecondary}]}>
+                            {new Date(notif.createdAt!).getDay()}/{new Date(notif.createdAt!).getMonth() + 1} - {new Date(notif.createdAt!).getHours()}:{new Date(notif.createdAt!).getMinutes()}
+                        </Text>
+                    </View>
+                </GlassSurface>
+            </Pressable>
+        </Animated.View>
+    )
+}
 
 export default function NotificationScreen() {
     const [notifications, setNotifications] = useState<Noti[]>([])
@@ -57,26 +105,16 @@ export default function NotificationScreen() {
                     <Text style={[{color: Colors[theme].textSecondary}]}>No hay notificaciones</Text>
                 ) : (
                     notifications.map((notif, index) => (
-                        <TouchableOpacity key={index} style={[styles.nav, {
-                            borderColor: Colors[theme].nav.border,
-                            backgroundColor: Colors[theme].header.background
-                        }]} onPress={() => {
-                            setSelectedNotification(notif)
-                            setShowAlert(true)
-                        }}>
-                            <View style={[styles.imageContainer, {backgroundColor: Colors[theme].primaryBackground}]}>
-                                <Feather name={notif.title.toLowerCase().includes('solicitud') ? 'users' : 'file-plus'}
-                                         color={Colors[theme].primary} size={30}/>
-                            </View>
-                            <View style={[styles.textContainer]}>
-                                <Text style={[{color: Colors[theme].text}]}>
-                                    {notif.content}
-                                </Text>
-                                <Text style={[{color: Colors[theme].textSecondary}]}>
-                                    {new Date(notif.createdAt!).getDay()}/{new Date(notif.createdAt!).getMonth() + 1} - {new Date(notif.createdAt!).getHours()}:{new Date(notif.createdAt!).getMinutes()}
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
+                        <NotificationRow
+                            key={index}
+                            notif={notif}
+                            theme={theme}
+                            index={index}
+                            onPress={() => {
+                                setSelectedNotification(notif)
+                                setShowAlert(true)
+                            }}
+                        />
                     ))
                 )}
             </Main>
@@ -110,22 +148,21 @@ export default function NotificationScreen() {
 
 const styles = StyleSheet.create({
     imageContainer: {
-        borderRadius: 8,
-        padding: 8,
+        borderRadius: Radius.pill,
+        padding: Spacing.md,
     },
     nav: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 20,
-        borderWidth: 0.5,
-        borderRadius: 15,
-        gap: 10,
-        marginBottom: 10,
+        padding: Spacing.base,
+        gap: Spacing.md,
+        marginBottom: Spacing.sm,
     },
     textContainer: {
         display: 'flex',
         flexDirection: 'column',
-        gap: 5
+        gap: Spacing.xs,
+        flexShrink: 1,
     },
 })

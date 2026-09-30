@@ -2,24 +2,70 @@ import React, { useEffect, useRef, useState } from 'react'
 import {
   View,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   useColorScheme,
   Text,
 } from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { Colors } from '@/constants/Colors'
+import { GlassSurface } from '@/components/ui/glass-view'
+import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
 import Constants from 'expo-constants'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
+import * as Haptics from 'expo-haptics'
 import { API_URL } from '@/constants/config'
 import { Message } from '@/lib/interfaces'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useAuth } from '@/hooks/useAuth'
+import { useTabBarVisibility } from '@/contexts/TabBarContext'
+import { useCallback } from 'react'
 // eslint-disable-next-line import/no-named-as-default
 import io, { Socket } from 'socket.io-client'
+
+function MessageBubble({ message, isMine, theme, getInitials }: { message: Message, isMine: boolean, theme: 'light' | 'dark', getInitials: (n: string) => string }) {
+  const entrance = useSharedValue(0)
+
+  useEffect(() => {
+    entrance.value = withSpring(1, Motion.springSoft)
+  }, [])
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: entrance.value,
+    transform: [
+      { scale: 0.85 + entrance.value * 0.15 },
+      { translateY: (1 - entrance.value) * 8 },
+    ],
+  }))
+
+  return (
+    <Animated.View
+      style={[
+        styles.bubble,
+        animatedStyle,
+        {
+          backgroundColor: isMine ? Colors[theme].primary : Colors[theme].header.background,
+          alignSelf: isMine ? 'flex-end' : 'flex-start',
+          borderBottomRightRadius: isMine ? Radius.xs : Radius.lg,
+          borderBottomLeftRadius: isMine ? Radius.lg : Radius.xs,
+        },
+      ]}
+    >
+      {!isMine && (
+        <Text style={[styles.sender, { color: Colors[theme].textSecondary }]}>
+          {getInitials(message.sender.name!)}
+        </Text>
+      )}
+      <Text style={{ color: isMine ? 'white' : Colors[theme].text, ...Typography.body }}>
+        {message.content}
+      </Text>
+    </Animated.View>
+  )
+}
 
 export default function ChatScreen() {
   const [message, setMessage] = useState('')
@@ -28,8 +74,18 @@ export default function ChatScreen() {
   const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
   const messagesEndRef = useRef<ScrollView>(null)
   const { user } = useAuth()
+  const sendScale = useSharedValue(1)
+  const sendAnimatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: sendScale.value }] }))
 
   const { id } = useLocalSearchParams()
+  const { setIsTabBarHidden } = useTabBarVisibility()
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsTabBarHidden(true)
+      return () => setIsTabBarHidden(false)
+    }, [])
+  )
 
   useEffect((): any => {
     const newSocket = io(API_URL)
@@ -86,6 +142,8 @@ export default function ChatScreen() {
   const handleMessageSend = async () => {
     if (!message || message.trim() === '') return
 
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+
     if (socket && id && user) {
       const t = await SecureStore.getItemAsync('authToken')
 
@@ -120,24 +178,16 @@ export default function ChatScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: Colors[colorScheme].header.background,
-            borderColor: Colors[colorScheme].header.border,
-          },
-        ]}
-      >
-        <TouchableOpacity style={styles.title} onPress={() => router.back()}>
+      <GlassSurface tint={colorScheme} radius={0} style={styles.header}>
+        <Pressable style={styles.title} onPress={() => router.back()}>
           <Feather
             name="arrow-left"
             size={20}
             color={Colors[colorScheme].textSecondary}
           />
-          <Text style={[{ color: Colors[colorScheme].text }]}>{messages[0] ? messages[0].chat?.topic?.title : ''}</Text>
-        </TouchableOpacity>
-      </View>
+          <Text style={[Typography.bodyStrong, { color: Colors[colorScheme].text }]}>{messages[0] ? messages[0].chat?.topic?.title : ''}</Text>
+        </Pressable>
+      </GlassSurface>
 
       <ScrollView
         ref={messagesEndRef}
@@ -150,120 +200,101 @@ export default function ChatScreen() {
         {messages &&
           user &&
           messages.map((message) => (
-            <View
+            <MessageBubble
               key={message.id}
-              style={{
-                backgroundColor:
-                  message.sender.id === user.id
-                    ? Colors[colorScheme].primary
-                    : Colors[colorScheme].header.background,
-                padding: 10,
-                borderRadius: 10,
-                marginBottom: 10,
-                alignSelf:
-                  message.sender.id === user.id ? 'flex-end' : 'flex-start',
-                maxWidth: '80%',
-              }}
-            >
-              {/* Mostrar iniciales solo si no es el usuario actual */}
-              {message.sender.id !== user.id && (
-                <Text
-                  style={{
-                    color: Colors[colorScheme].textSecondary,
-                    fontSize: 12,
-                    marginBottom: 4,
-                  }}
-                >
-                  {getInitials(message.sender.name!)}
-                </Text>
-              )}
-              <Text
-                style={{
-                  color:
-                    message.sender.id === user.id
-                      ? 'white'
-                      : Colors[colorScheme].text,
-                }}
-              >
-                {message.content}
-              </Text>
-            </View>
+              message={message}
+              isMine={message.sender.id === user.id}
+              theme={colorScheme}
+              getInitials={getInitials}
+            />
           ))}
       </ScrollView>
 
-      <View
-        style={[
-          styles.inputContainer,
-          {
-            backgroundColor: Colors[colorScheme].nav.background,
-            borderColor: Colors[colorScheme].nav.border,
-          },
-        ]}
-      >
+      <GlassSurface tint={colorScheme} radius={0} style={styles.inputContainer}>
         <TextInput
           style={[
             styles.input,
             {
-              backgroundColor: Colors[colorScheme].background,
+              backgroundColor: Colors[colorScheme].input,
               color: Colors[colorScheme].text,
             },
           ]}
           placeholder="Escribe un mensaje..."
-          placeholderTextColor={Colors[colorScheme].text + '80'}
+          placeholderTextColor={Colors[colorScheme].textSecondary}
           value={message}
           onChangeText={setMessage}
           multiline
         />
-        <TouchableOpacity style={styles.sendButton} onPress={handleMessageSend}>
-          <Feather name="send" size={24} color={Colors[colorScheme].primary} />
-        </TouchableOpacity>
-      </View>
+        <Animated.View style={sendAnimatedStyle}>
+          <Pressable
+            onPressIn={() => { sendScale.value = withSpring(0.85, Motion.spring) }}
+            onPressOut={() => { sendScale.value = withSpring(1, Motion.spring) }}
+            style={[styles.sendButton, { backgroundColor: Colors[colorScheme].primary }]}
+            onPress={handleMessageSend}
+          >
+            <Feather name="arrow-up" size={20} color="#fff" />
+          </Pressable>
+        </Animated.View>
+      </GlassSurface>
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  chatContainer: { flex: 1, padding: 10, paddingBottom: 20 },
+  chatContainer: { flex: 1, padding: Spacing.md, paddingBottom: Spacing.lg },
+  bubble: {
+    padding: Spacing.md,
+    borderRadius: Radius.lg,
+    marginBottom: Spacing.sm,
+    maxWidth: '80%',
+  },
+  sender: {
+    ...Typography.label,
+    fontWeight: '600',
+    textTransform: 'none',
+    marginBottom: Spacing.xs,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    borderTopWidth: 1,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    padding: Spacing.base,
+    gap: Spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   input: {
+    ...Typography.body,
     flex: 1,
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginRight: 10,
+    borderRadius: Radius.pill,
+    paddingHorizontal: Spacing.base,
+    paddingVertical: Spacing.md,
     maxHeight: 100,
   },
-  sendButton: { padding: 10 },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   header: {
     display: 'flex',
     flexDirection: 'row',
-    borderBottomWidth: 2,
-    borderLeftWidth: 0.5,
-    borderRightWidth: 0.5,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     overflow: 'hidden',
     paddingTop: Constants.statusBarHeight,
-    padding: 20,
+    padding: Spacing.lg,
   },
   title: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 10,
-    gap: 10,
+    paddingTop: Spacing.sm,
+    gap: Spacing.sm,
   },
   chatList: {
-    marginTop: 10,
-    marginBottom: 14,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.md,
   },
 })

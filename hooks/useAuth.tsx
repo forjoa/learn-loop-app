@@ -1,9 +1,20 @@
-import { useEffect, useState } from 'react'
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import * as SecureStore from 'expo-secure-store'
 import { API_URL } from '@/constants/config'
 import { User } from '@/lib/interfaces'
 
-export function useAuth() {
+interface AuthContextValue {
+    user: User | null
+    loading: boolean
+    error: string | null
+    login: (email: string, password: string) => Promise<{ success: boolean, error?: string }>
+    register: (name: string, email: string, password: string, role: string, photo: string) => Promise<{ success: boolean, error?: string }>
+    logout: () => Promise<void>
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null)
+
+export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -85,7 +96,7 @@ export function useAuth() {
                 throw new Error(errorData.message || 'Registration failed')
             }
 
-            const data = await response.json()
+            await response.json()
             return {success: true}
         } catch (err) {
             console.error(err)
@@ -102,5 +113,17 @@ export function useAuth() {
         setUser(null)
     }
 
-    return {user, login, register, logout, loading, error}
+    return (
+        <AuthContext.Provider value={{user, login, register, logout, loading, error}}>
+            {children}
+        </AuthContext.Provider>
+    )
+}
+
+export function useAuth() {
+    const context = useContext(AuthContext)
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider')
+    }
+    return context
 }
