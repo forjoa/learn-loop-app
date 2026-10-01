@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, ViewProps, ViewStyle } from 'react-native'
 import { BlurView } from 'expo-blur'
-import { GlassView as NativeGlassView } from 'expo-glass-effect'
+import { GlassView as NativeGlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect'
 import { Radius } from '@/constants/Theme'
 
 interface GlassSurfaceProps extends ViewProps {
@@ -13,12 +13,12 @@ interface GlassSurfaceProps extends ViewProps {
     children?: React.ReactNode
 }
 
-// Disabled for now: expo-glass-effect's native GlassView (iOS 26's brand-new
-// Liquid Glass API) has been unreliable on first mount (renders without its
-// border/background until the screen is revisited) — likely a beta-era native
-// rendering bug per Expo's own docs warning. The BlurView-based fallback below
-// is more mature and consistent, so we use it everywhere until that matures.
-const nativeGlassAvailable = false
+// isLiquidGlassAvailable() is a compile-time check and can report true on iOS 26
+// betas where the native UIGlassEffect selector isn't actually there yet (crashes -
+// see expo/expo#40911). isGlassEffectAPIAvailable() is the runtime-safe check Expo
+// recommends instead. Screens must also never animate opacity on a GlassSurface or
+// any of its ancestors (expo/expo#50097) - use transform-only entrance animations.
+const nativeGlassAvailable = isGlassEffectAPIAvailable()
 
 /**
  * Cross-platform "glass" surface: real Apple Liquid Glass on iOS 26+,

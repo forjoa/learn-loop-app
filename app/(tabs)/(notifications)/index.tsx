@@ -24,8 +24,9 @@ function NotificationRow({ notif, theme, index, onPress }: { notif: Noti, theme:
         )
     }, [])
 
+    // No opacity here: wraps a GlassSurface, and animating opacity on a GlassView or
+    // its ancestors breaks/crashes native Liquid Glass (expo/expo#50097).
     const animatedStyle = useAnimatedStyle(() => ({
-        opacity: entrance.value,
         transform: [
             { translateY: (1 - entrance.value) * 12 },
             { scale: scale.value },

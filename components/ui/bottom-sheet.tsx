@@ -107,11 +107,11 @@ export default function BottomSheet({
 
             <GestureDetector gesture={gesture}>
                 <Animated.View style={[styles.sheetWrapper, rSheetStyle]}>
-                    <GlassSurface
-                        tint={theme}
-                        radius={0}
-                        style={[styles.sheet, {borderColor: Colors[theme].border}]}
-                    >
+                    {/* GlassSurface is background-only here, sibling to the scrollable
+                        content rather than its container - native GlassView breaks/crashes
+                        with scrollable descendants (expo/expo#50097-adjacent reports). */}
+                    <View style={[styles.sheet, {borderColor: Colors[theme].border}]}>
+                        <GlassSurface tint={theme} radius={0} style={StyleSheet.absoluteFill}/>
                         <View
                             style={[
                                 styles.line,
@@ -121,7 +121,7 @@ export default function BottomSheet({
                         <SafeAreaView style={styles.content}>
                             {children}
                         </SafeAreaView>
-                    </GlassSurface>
+                    </View>
                 </Animated.View>
             </GestureDetector>
         </Modal>
@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: Radius.xxl,
         borderTopRightRadius: Radius.xxl,
         borderWidth: StyleSheet.hairlineWidth,
+        overflow: 'hidden',
     },
     line: {
         width: 48,

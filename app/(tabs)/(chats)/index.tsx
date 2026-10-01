@@ -30,8 +30,9 @@ function ChatRow({ chat, theme, index }: { chat: Chat, theme: 'light' | 'dark', 
     )
   }, [])
 
+  // No opacity here: wraps a GlassSurface, and animating opacity on a GlassView or
+  // its ancestors breaks/crashes native Liquid Glass (expo/expo#50097).
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: entrance.value,
     transform: [
       { translateY: (1 - entrance.value) * 12 },
       { scale: scale.value },

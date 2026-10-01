@@ -65,8 +65,9 @@ export default function Register() {
     useEffect(() => {
         entrance.value = withDelay(80, withTiming(1, { duration: Motion.durationSlow, easing: Easing.out(Easing.cubic) }))
     }, [])
+    // No opacity here: entrance wraps a GlassSurface, and animating opacity on a
+    // GlassView or its ancestors breaks/crashes native Liquid Glass (expo/expo#50097).
     const entranceStyle = useAnimatedStyle(() => ({
-        opacity: entrance.value,
         transform: [{ translateY: (1 - entrance.value) * 24 }],
     }))
 

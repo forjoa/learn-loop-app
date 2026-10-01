@@ -77,7 +77,7 @@ export function AppHeader({
             {variant === 'home' ? (
                 <>
                     <View style={styles.row}>
-                        <Pressable style={styles.identity} onPress={() => router.push('/profile')}>
+                        <Pressable style={styles.identity} onPress={() => router.push('/(tabs)/(profile)')}>
                             {user?.photo ? (
                                 <Image source={profileImages[user.photo]} style={styles.avatar} />
                             ) : (
@@ -98,7 +98,7 @@ export function AppHeader({
                                 name="bell"
                                 theme={theme}
                                 badge={notificationCount}
-                                onPress={() => router.push('/notifications')}
+                                onPress={() => router.push('/(tabs)/(notifications)')}
                             />
                         </View>
                     </View>

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Modal, View, Text, StyleSheet } from 'react-native'
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { BlurView } from 'expo-blur'
 import { Colors } from '@/constants/Colors'
 import { GlassSurface } from './glass-view'
@@ -34,26 +34,21 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                                                  }) => {
     const currentColors = Colors[theme]
     const scale = useSharedValue(0.9)
-    const opacity = useSharedValue(0)
 
     useEffect(() => {
-        if (visible) {
-            scale.value = withSpring(1, Motion.spring)
-            opacity.value = withTiming(1, { duration: Motion.durationFast })
-        } else {
-            scale.value = 0.9
-            opacity.value = 0
-        }
+        scale.value = visible ? withSpring(1, Motion.spring) : 0.9
     }, [visible])
 
+    // No opacity here (and the Modal itself uses animationType="none"): wraps a
+    // GlassSurface, and animating opacity on a GlassView or its ancestors - including
+    // the Modal's own native fade transition - breaks/crashes Liquid Glass (expo/expo#50097).
     const cardStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value,
         transform: [{ scale: scale.value }],
     }))
 
     return (
         <Modal
-            animationType="fade"
+            animationType="none"
             transparent={true}
             visible={visible}
             onRequestClose={onCancel}

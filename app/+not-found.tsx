@@ -18,7 +18,7 @@ export default function NotFoundScreen() {
       <Text style={[styles.subtitle, { color: Colors[theme].textSecondary }]}>
         Puede que el enlace esté roto o la página se haya movido.
       </Text>
-      <Button label="Volver al inicio" onPress={() => router.replace('/(tabs)')} style={styles.button} />
+      <Button label="Volver al inicio" onPress={() => router.replace('/(tabs)/(home)')} style={styles.button} />
     </SafeAreaView>
   )
 }

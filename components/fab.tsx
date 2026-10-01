@@ -156,10 +156,13 @@ export function FloatingButton({
         </TouchableOpacity>
       </View>
 
+      {/* animationType="none": the Modal's own native fade transition animates opacity
+          on everything inside it, including the GlassSurface below, which breaks/
+          crashes native Liquid Glass (expo/expo#50097). */}
       <Modal
         visible={isLoading}
         transparent={true}
-        animationType="fade"
+        animationType="none"
       >
         <View style={[StyleSheet.absoluteFill, styles.loadingBackdrop, {backgroundColor: Colors[colorScheme].backdrop}]}>
           <GlassSurface tint={colorScheme} radius={Radius.xl} style={styles.loadingCard}>
