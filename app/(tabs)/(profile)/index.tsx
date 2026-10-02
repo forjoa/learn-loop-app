@@ -59,7 +59,7 @@ export default function ProfileScreen() {
 
     const handleEditSubmit = async () => {
         try {
-            const response = await fetch(`${API_URL}/users/edit`, {
+            const response = await fetch(`${API_URL}/users/${user?.id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -68,7 +68,6 @@ export default function ProfileScreen() {
                 body: JSON.stringify({
                     photo: profilePhoto,
                     role,
-                    id: user?.id,
                     name: user?.name,
                     email: user?.email,
                 }),

@@ -94,7 +94,7 @@ export default function NewContent({
     const fetchTopicsByOwner = async () => {
         try {
             setLoadingTopics(true)
-            const response = await fetch(`${API_URL}/topics/getAllByOwner?ownerId=${user?.id}`, {
+            const response = await fetch(`${API_URL}/topics?ownerId=${user?.id}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

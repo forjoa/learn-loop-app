@@ -48,7 +48,7 @@ export const requestEnrollment = async (topicId: string, setLoading: (loading: b
 
     try {
         setLoading(true)
-        await fetch(`${API_URL}/enrollments/create`, {
+        await fetch(`${API_URL}/enrollments`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

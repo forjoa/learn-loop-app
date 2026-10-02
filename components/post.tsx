@@ -44,7 +44,7 @@ export default function Post({
     useEffect(() => {
         if (currentPostId) {
             const loadPost = async () => {
-                const result = await fetch(`${API_URL}/posts/?id=${currentPostId}`, {
+                const result = await fetch(`${API_URL}/posts/${currentPostId}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

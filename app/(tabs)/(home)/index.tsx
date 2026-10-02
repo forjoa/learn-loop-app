@@ -21,7 +21,7 @@ export default function HomeScreen() {
         if (!user) return
 
         const t = await SecureStore.getItemAsync('authToken')
-        const result = await fetch(`${API_URL}/topics/getAllByUser?userId=${user.id}`, {
+        const result = await fetch(`${API_URL}/users/${user.id}/topics`, {
             'method': 'GET',
             'headers': {
                 'Authorization': `Bearer ${t}`,

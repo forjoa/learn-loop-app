@@ -70,7 +70,7 @@ export default function NotificationScreen() {
     const loadNotifications = async () => {
         const token = await SecureStorage.getItemAsync('authToken')
         if (user) {
-            const response = await fetch(`${API_URL}/notifications/get?userId=${user?.id as string}`, {
+            const response = await fetch(`${API_URL}/users/${user?.id as string}/notifications`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -82,15 +82,15 @@ export default function NotificationScreen() {
         }
     }
 
-    const enrollmentAction = async (enrollmentId: string, action: string) => {
+    const enrollmentAction = async (enrollmentId: string, status: 'APPROVED' | 'REJECTED') => {
         const token = await SecureStorage.getItemAsync('authToken')
-        const response = await fetch(`${API_URL}/enrollments/${action}`, {
-            method: 'POST',
+        const response = await fetch(`${API_URL}/enrollments/${enrollmentId}`, {
+            method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({id: enrollmentId}),
+            body: JSON.stringify({status}),
         })
         await response.json()
     }
@@ -128,7 +128,7 @@ export default function NotificationScreen() {
                 cancelText="Cancelar"
                 onConfirm={() => {
                     if (selectedNotification?.enrollmentId) {
-                        enrollmentAction(selectedNotification.enrollmentId, 'accept')
+                        enrollmentAction(selectedNotification.enrollmentId, 'APPROVED')
                     }
                     setShowAlert(false)
                 }}
@@ -139,7 +139,7 @@ export default function NotificationScreen() {
                 // student's "accepted"/"rejected" notification) has no enrollmentId
                 // and should just read as informational, with no deny option.
                 onDeny={selectedNotification?.enrollmentId ? () => {
-                    enrollmentAction(selectedNotification.enrollmentId!, 'deny')
+                    enrollmentAction(selectedNotification.enrollmentId!, 'REJECTED')
                     setShowAlert(false)
                 } : undefined}
                 theme={theme}

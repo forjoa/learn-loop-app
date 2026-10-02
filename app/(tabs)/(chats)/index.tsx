@@ -90,7 +90,7 @@ export default function ChatsScreen() {
     const token = await SecureStorage.getItemAsync('authToken')
     if (user) {
       const response = await fetch(
-        `${API_URL}/chats/getAll?userId=${user?.id as string}`,
+        `${API_URL}/users/${user?.id as string}/chats`,
         {
           method: 'GET',
           headers: {

@@ -40,7 +40,7 @@ export default function JoinTopicScreen() {
     useEffect(() => {
         const loadPreview = async () => {
             try {
-                const result = await fetch(`${API_URL}/public/topics/preview?id=${topicId}`)
+                const result = await fetch(`${API_URL}/public/topics/${topicId}`)
                 if (!result.ok) {
                     setState('not-found')
                     return
@@ -66,7 +66,7 @@ export default function JoinTopicScreen() {
             setCheckingStatus(true)
             try {
                 const token = await SecureStore.getItemAsync('authToken')
-                const result = await fetch(`${API_URL}/enrollments/status?userId=${user.id}&topicId=${topicId}`, {
+                const result = await fetch(`${API_URL}/enrollments?userId=${user.id}&topicId=${topicId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ export default function JoinTopicScreen() {
         setSubmitting(true)
         try {
             const token = await SecureStore.getItemAsync('authToken')
-            await fetch(`${API_URL}/enrollments/create`, {
+            await fetch(`${API_URL}/enrollments`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,

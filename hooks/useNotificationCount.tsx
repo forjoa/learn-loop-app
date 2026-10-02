@@ -11,7 +11,7 @@ export function useNotificationCount() {
         const load = async () => {
             if (!user) return
             const token = await SecureStore.getItemAsync('authToken')
-            const response = await fetch(`${API_URL}/notifications/get?userId=${user.id}`, {
+            const response = await fetch(`${API_URL}/users/${user.id}/notifications`, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             })
             const data = await response.json()

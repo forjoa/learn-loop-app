@@ -126,7 +126,7 @@ export default function ChatScreen() {
     const loadMessages = async () => {
       const t = await SecureStore.getItemAsync('authToken')
 
-      const result = await fetch(`${API_URL}/messages/get?chatId=${id}`, {
+      const result = await fetch(`${API_URL}/chats/${id}/messages`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${t}`,
@@ -145,7 +145,7 @@ export default function ChatScreen() {
     const loadChatDetail = async () => {
       const t = await SecureStore.getItemAsync('authToken')
 
-      const result = await fetch(`${API_URL}/chats/chat?id=${id}`, {
+      const result = await fetch(`${API_URL}/chats/${id}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${t}`,
@@ -189,14 +189,13 @@ export default function ChatScreen() {
     if (socket && id && user) {
       const t = await SecureStore.getItemAsync('authToken')
 
-      const result = await fetch(`${API_URL}/messages/send`, {
+      const result = await fetch(`${API_URL}/chats/${id}/messages`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${t}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          chatId: id,
           content: message,
           senderId: user?.id,
         }),

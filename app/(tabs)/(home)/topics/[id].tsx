@@ -160,7 +160,7 @@ export default function TopicDetails() {
 
   const loadTopic = async (topicId: string) => {
     const token = await SecureStore.getItemAsync('authToken')
-    const result = await fetch(`${API_URL}/topics/topic?id=${topicId}`, {
+    const result = await fetch(`${API_URL}/topics/${topicId}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -173,7 +173,7 @@ export default function TopicDetails() {
 
   const loadPendingRequests = async (topicId: string) => {
     const token = await SecureStore.getItemAsync('authToken')
-    const result = await fetch(`${API_URL}/enrollments/pending?topicId=${topicId}`, {
+    const result = await fetch(`${API_URL}/topics/${topicId}/enrollments`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -185,20 +185,20 @@ export default function TopicDetails() {
     }
   }
 
-  const resolveRequest = async (enrollmentId: string, action: 'accept' | 'deny') => {
+  const resolveRequest = async (enrollmentId: string, status: 'APPROVED' | 'REJECTED') => {
     const token = await SecureStore.getItemAsync('authToken')
-    await fetch(`${API_URL}/enrollments/${action}`, {
-      method: 'POST',
+    await fetch(`${API_URL}/enrollments/${enrollmentId}`, {
+      method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: enrollmentId }),
+      body: JSON.stringify({ status }),
     })
 
     if (typeof id === 'string') {
       loadPendingRequests(id)
-      if (action === 'accept') loadTopic(id)
+      if (status === 'APPROVED') loadTopic(id)
     }
   }
 
@@ -283,8 +283,8 @@ export default function TopicDetails() {
                       key={request.id}
                       request={request}
                       theme={theme}
-                      onAccept={() => resolveRequest(request.id, 'accept')}
-                      onDeny={() => resolveRequest(request.id, 'deny')}
+                      onAccept={() => resolveRequest(request.id, 'APPROVED')}
+                      onDeny={() => resolveRequest(request.id, 'REJECTED')}
                     />
                   ))}
                 </View>
