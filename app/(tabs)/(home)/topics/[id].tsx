@@ -11,6 +11,7 @@ import {
   Share,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as Linking from 'expo-linking'
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming, Easing } from 'react-native-reanimated'
 import Main from '@/components/ui/main'
 import { Colors } from '@/constants/Colors'
@@ -19,12 +20,13 @@ import { Motion, Radius, Spacing, Typography } from '@/constants/Theme'
 import { useEffect, useState } from 'react'
 import { API_URL } from '@/constants/config'
 import * as SecureStore from 'expo-secure-store'
-import { DetailedTopic } from '@/lib/interfaces'
+import { DetailedTopic, PendingEnrollment } from '@/lib/interfaces'
 import { profileImages } from '@/assets/profile-images'
 import Feather from '@expo/vector-icons/Feather'
 import Post from '@/components/post'
 import { useAuth } from '@/hooks/useAuth'
 import { FloatingButton } from '@/components/fab'
+import QuickPostSheet from '@/components/forms/quick-post-sheet'
 
 const { width } = Dimensions.get('window')
 
@@ -104,14 +106,57 @@ function PostRow({ post, theme, index, onPress }: { post: any, theme: 'light' | 
   )
 }
 
+function PendingRequestRow({
+  request,
+  theme,
+  onAccept,
+  onDeny,
+}: {
+  request: PendingEnrollment
+  theme: 'light' | 'dark'
+  onAccept: () => void
+  onDeny: () => void
+}) {
+  return (
+    <GlassSurface tint={theme} radius={Radius.lg} style={styles.requestContainer}>
+      <Image source={profileImages[request.user.photo]} style={styles.requestAvatar} />
+      <View style={styles.requestInfo}>
+        <Text style={[Typography.bodyStrong, { color: Colors[theme].text }]} numberOfLines={1}>
+          {request.user.name}
+        </Text>
+        <Text style={[Typography.small, { color: Colors[theme].textSecondary }]} numberOfLines={1}>
+          {request.user.email}
+        </Text>
+      </View>
+      <View style={styles.requestActions}>
+        <Pressable
+          onPress={onDeny}
+          style={[styles.requestButton, { backgroundColor: Colors[theme].input }]}
+        >
+          <Feather name="x" size={16} color={Colors[theme].error} />
+        </Pressable>
+        <Pressable
+          onPress={onAccept}
+          style={[styles.requestButton, { backgroundColor: Colors[theme].primary }]}
+        >
+          <Feather name="check" size={16} color="#fff" />
+        </Pressable>
+      </View>
+    </GlassSurface>
+  )
+}
+
 export default function TopicDetails() {
   const [topic, setTopic] = useState<DetailedTopic>()
   const [postIsVisible, setPostIsVisible] = useState(false)
   const [selectedPostId, setSelectedPostId] = useState<string>()
+  const [quickPostVisible, setQuickPostVisible] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [pendingRequests, setPendingRequests] = useState<PendingEnrollment[]>([])
   const { user } = useAuth()
   const { id } = useLocalSearchParams()
   const theme = useColorScheme() === 'light' ? 'light' : 'dark'
+  const isOwner = user?.id === topic?.ownerId
 
   const loadTopic = async (topicId: string) => {
     const token = await SecureStore.getItemAsync('authToken')
@@ -125,6 +170,43 @@ export default function TopicDetails() {
     const data = await result.json()
     setTopic(data)
   }
+
+  const loadPendingRequests = async (topicId: string) => {
+    const token = await SecureStore.getItemAsync('authToken')
+    const result = await fetch(`${API_URL}/enrollments/pending?topicId=${topicId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    if (result.ok) {
+      setPendingRequests(await result.json())
+    }
+  }
+
+  const resolveRequest = async (enrollmentId: string, action: 'accept' | 'deny') => {
+    const token = await SecureStore.getItemAsync('authToken')
+    await fetch(`${API_URL}/enrollments/${action}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: enrollmentId }),
+    })
+
+    if (typeof id === 'string') {
+      loadPendingRequests(id)
+      if (action === 'accept') loadTopic(id)
+    }
+  }
+
+  useEffect(() => {
+    if (typeof id === 'string' && isOwner) {
+      loadPendingRequests(id)
+    }
+  }, [id, isOwner])
 
   useEffect(() => {
     if (typeof id === 'string') {
@@ -149,17 +231,37 @@ export default function TopicDetails() {
       <Main onLoad={() => loadTopic(id as string)}>
         <View style={styles.optionsContainer}>
           <TopBarButton name="arrow-left" onPress={goBack} theme={theme} />
-          {user?.id === topic?.ownerId && (
-            <TopBarButton
-              name="share"
-              theme={theme}
-              onPress={() => {
-                Share.share({
-                  message: `¡Hola! Te invito a unirte a mi clase: ${topic?.id}. https://learn-loop-platform.vercel.app/`,
-                })
-              }}
-            />
-          )}
+          <View style={styles.optionsGroup}>
+            {!!topic?.chatId && (
+              <TopBarButton
+                name="message-circle"
+                theme={theme}
+                onPress={() => router.push(`/chat/${topic.chatId}` as RelativePathString)}
+              />
+            )}
+            {isOwner && (
+              <>
+                <TopBarButton
+                  name="plus"
+                  theme={theme}
+                  onPress={() => setQuickPostVisible(true)}
+                />
+                <TopBarButton
+                  name="share"
+                  theme={theme}
+                  onPress={() => {
+                    // Linking.createURL resolves to the right protocol for however
+                    // this build is running (exp:// in Expo Go during development,
+                    // the app's own learnloop:// scheme in a standalone build).
+                    const joinLink = Linking.createURL(`/join/${topic?.id}`)
+                    Share.share({
+                      message: `¡Hola! Te invito a unirte a mi clase "${topic?.title}" en Learn Loop. Abre este enlace para unirte: ${joinLink}`,
+                    })
+                  }}
+                />
+              </>
+            )}
+          </View>
         </View>
         {topic ? (
           <View style={[styles.container]}>
@@ -171,6 +273,23 @@ export default function TopicDetails() {
                 {topic?.description}
               </Text>
             </GlassSurface>
+
+            {isOwner && pendingRequests.length > 0 && (
+              <>
+                <SectionLabel icon="user-plus" label={`Solicitudes pendientes (${pendingRequests.length})`} theme={theme} />
+                <View style={styles.requestsList}>
+                  {pendingRequests.map((request) => (
+                    <PendingRequestRow
+                      key={request.id}
+                      request={request}
+                      theme={theme}
+                      onAccept={() => resolveRequest(request.id, 'accept')}
+                      onDeny={() => resolveRequest(request.id, 'deny')}
+                    />
+                  ))}
+                </View>
+              </>
+            )}
 
             <SectionLabel icon="users" label="Miembros" theme={theme} />
             <ScrollView
@@ -231,7 +350,7 @@ export default function TopicDetails() {
         )}
       </Main>
 
-      {user?.id === topic?.ownerId && (
+      {isOwner && (
         <FloatingButton onPress={onPress} style={{ bottom: 110, right: 30 }} topicId={typeof id == 'string' ? id : id[0]}/>
       )}
 
@@ -241,6 +360,15 @@ export default function TopicDetails() {
         colorScheme={theme}
         currentPostId={selectedPostId!}
       />
+
+      {topic && (
+        <QuickPostSheet
+          topic={topic}
+          isVisible={quickPostVisible}
+          onClose={() => setQuickPostVisible(false)}
+          onPosted={() => loadTopic(topic.id)}
+        />
+      )}
     </SafeAreaView>
   )
 }
@@ -256,6 +384,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: Spacing.sm,
     marginBottom: Spacing.sm,
+  },
+  optionsGroup: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
   },
   topBarButton: {
     width: 40,
@@ -323,5 +455,34 @@ const styles = StyleSheet.create({
   },
   postTitle: {
     ...Typography.bodyStrong,
+  },
+  requestsList: {
+    gap: Spacing.sm,
+  },
+  requestContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    padding: Spacing.sm,
+  },
+  requestAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: Radius.pill,
+  },
+  requestInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  requestActions: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+  },
+  requestButton: {
+    width: 32,
+    height: 32,
+    borderRadius: Radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })
