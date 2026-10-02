@@ -1,4 +1,4 @@
-import { TextInput, View, StyleSheet, useColorScheme, Alert } from 'react-native'
+import { TextInput, Text, View, StyleSheet, useColorScheme, Alert } from 'react-native'
 import { Colors } from '@/constants/Colors'
 import { Radius, Spacing, Typography } from '@/constants/Theme'
 import { API_URL } from '@/constants/config'
@@ -16,36 +16,41 @@ export default function NewTopicForm({ title, setTitle, description, setDescript
 
     return (
         <View style={styles.form}>
-            <TextInput
-                style={[styles.input,
-                    {
+            <View>
+                <Text style={[styles.label, { color: Colors[theme].textSecondary }]}>Título del tema</Text>
+                <TextInput
+                    style={[styles.input, {
                         color: Colors[theme].text,
                         backgroundColor: Colors[theme].input,
                         borderColor: Colors[theme].border,
-                    }
-                ]
-                }
-                placeholder="Título del tema"
-                placeholderTextColor={Colors[theme].textSecondary}
-                value={title}
-                onChangeText={setTitle}
-            />
-            <TextInput
-                style={[styles.textarea,
-                    {
+                    }]}
+                    placeholder="Ej. Matemáticas II"
+                    placeholderTextColor={Colors[theme].textSecondary}
+                    value={title}
+                    onChangeText={setTitle}
+                />
+            </View>
+
+            <View>
+                <Text style={[styles.label, { color: Colors[theme].textSecondary }]}>Descripción</Text>
+                <TextInput
+                    style={[styles.textarea, {
                         color: Colors[theme].text,
                         backgroundColor: Colors[theme].input,
                         borderColor: Colors[theme].border,
-                    }
-                ]
-                }
-                placeholder="Descripción del tema"
-                placeholderTextColor={Colors[theme].textSecondary}
-                value={description}
-                onChangeText={setDescription}
-                multiline
-                numberOfLines={4}
-            />
+                    }]}
+                    placeholder="De qué trata este tema, para que tus estudiantes sepan qué esperar"
+                    placeholderTextColor={Colors[theme].textSecondary}
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                    numberOfLines={4}
+                />
+            </View>
+
+            <Text style={[styles.hint, { color: Colors[theme].textSecondary }]}>
+                Al crear el tema podrás compartir su código con tus estudiantes para que se inscriban.
+            </Text>
         </View>
     )
 }
@@ -84,9 +89,10 @@ export const createTopic = async (title: string, description: string, setLoading
 const styles = StyleSheet.create({
     form: {
         marginBottom: Spacing.lg,
-        gap: Spacing.md,
+        gap: Spacing.base,
     },
     label: {
+        ...Typography.label,
         marginBottom: Spacing.sm,
     },
     input: {
@@ -101,5 +107,8 @@ const styles = StyleSheet.create({
         borderRadius: Radius.md,
         padding: Spacing.base,
         textAlignVertical: 'top',
-    }
+    },
+    hint: {
+        ...Typography.small,
+    },
 })

@@ -201,9 +201,15 @@ export default function NewContent({
             <Animated.View style={[styles.indicator, indicatorStyle, { backgroundColor: Colors[theme].primary }]} />
             {renderTab('topic', 'Nuevo tema')}
             {renderTab('post', 'Nuevo post')}
-            {renderTab('enrollment', 'Ingresar')}
+            {renderTab('enrollment', 'Unirme')}
         </View>
     )
+
+    const tabSubtitle: Record<FormType, string> = {
+        topic: 'Crea un tema para organizar tus clases y compartirlo con tus estudiantes.',
+        post: 'Publica contenido dentro de uno de tus temas existentes.',
+        enrollment: 'Únete a un tema de otro profesor con el código que te compartió.',
+    }
 
     const renderForm = () => {
         if (formType === 'topic') {
@@ -253,6 +259,11 @@ export default function NewContent({
                 >
                     {isTeacher ? 'Agregar contenido' : 'Inscribirse a un tema'}
                 </Text>
+                <Text style={[styles.subtitle, {color: Colors[theme].textSecondary}]}>
+                    {isTeacher
+                        ? tabSubtitle[formType]
+                        : 'Pídele a tu profesor el código del tema y pégalo abajo para enviar tu solicitud.'}
+                </Text>
 
                 {isTeacher ? (
                     <>
@@ -290,6 +301,10 @@ const styles = StyleSheet.create({
     },
     title: {
         ...Typography.title,
+        marginBottom: Spacing.xs,
+    },
+    subtitle: {
+        ...Typography.small,
         marginBottom: Spacing.lg,
     },
     tabsRow: {

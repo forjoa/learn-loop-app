@@ -1,4 +1,5 @@
 import { Alert, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native'
+import Feather from '@expo/vector-icons/Feather'
 import { Colors } from '@/constants/Colors'
 import { Radius, Spacing, Typography } from '@/constants/Theme'
 import { API_URL } from '@/constants/config'
@@ -14,22 +15,26 @@ export default function NewEnrollmentForm({topicId, setTopicId}: NewEnrollmentFo
 
     return (
         <View style={styles.form}>
-            <Text style={[styles.label, {color: Colors[theme].text}]}>
-                Ingresa el ID del tema para inscribirte:
+            <Text style={[styles.label, {color: Colors[theme].textSecondary}]}>
+                Código del tema
             </Text>
-            <TextInput
-                style={[styles.input, {
-                    color: Colors[theme].text,
-                    backgroundColor: Colors[theme].input,
-                    borderColor: Colors[theme].border,
-                }]}
-                placeholder="ID del tema"
-                placeholderTextColor={Colors[theme].textSecondary}
-                value={topicId}
-                onChangeText={setTopicId}
-            />
-            <Text style={[styles.enrollmentHelp, {color: Colors[theme].textSecondary || Colors[theme].text}]}>
-                Ingresa solamente el número ID del tema compartido por tu profesor.
+            <View style={[styles.inputWrapper, {
+                backgroundColor: Colors[theme].input,
+                borderColor: Colors[theme].border,
+            }]}>
+                <Feather name="hash" size={18} color={Colors[theme].textSecondary} />
+                <TextInput
+                    style={[styles.input, {color: Colors[theme].text}]}
+                    placeholder="Pégalo aquí"
+                    placeholderTextColor={Colors[theme].textSecondary}
+                    value={topicId}
+                    onChangeText={setTopicId}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                />
+            </View>
+            <Text style={[styles.hint, {color: Colors[theme].textSecondary}]}>
+                Pídele a tu profesor el código del tema y pégalo aquí para enviar tu solicitud de inscripción.
             </Text>
         </View>
     )
@@ -37,7 +42,7 @@ export default function NewEnrollmentForm({topicId, setTopicId}: NewEnrollmentFo
 
 export const requestEnrollment = async (topicId: string, setLoading: (loading: boolean) => void, token: string, resetForm: () => void, onClose: () => void, user: User) => {
     if (!topicId) {
-        Alert.alert('Error', 'Por favor ingresa el ID del tema')
+        Alert.alert('Error', 'Por favor ingresa el código del tema')
         return
     }
 
@@ -66,113 +71,28 @@ export const requestEnrollment = async (topicId: string, setLoading: (loading: b
 }
 
 const styles = StyleSheet.create({
-    container: {
-        paddingBottom: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    tabs: {
-        flexDirection: 'row',
-        marginBottom: 20,
-    },
-    tab: {
-        flex: 1,
-        paddingVertical: 10,
-        alignItems: 'center',
-    },
-    tabText: {
-        fontWeight: '500',
-    },
     form: {
         marginBottom: Spacing.lg,
     },
     label: {
-        ...Typography.small,
+        ...Typography.label,
         marginBottom: Spacing.sm,
+    },
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.sm,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: Radius.md,
+        paddingHorizontal: Spacing.base,
     },
     input: {
         ...Typography.body,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderRadius: Radius.md,
-        padding: Spacing.base,
-        marginBottom: Spacing.sm,
-    },
-    textarea: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 16,
-        textAlignVertical: 'top',
-    },
-    pickerContainer: {
-        borderWidth: 1,
-        borderRadius: 8,
-        marginBottom: 16,
-    },
-    button: {
-        padding: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 10,
-        borderRadius: 10,
-        borderTopWidth: 2,
-        borderLeftWidth: 0.5,
-        borderRightWidth: 0.5,
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontWeight: 'bold',
-    },
-    enrollmentHelp: {
-        ...Typography.label,
-        fontWeight: '400',
-        textTransform: 'none',
-        marginBottom: Spacing.sm,
-    },
-    topicDetails: {
-        padding: 10,
-        marginBottom: 16,
-    },
-    topicTitle: {
-        fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    topicDescription: {},
-    dropdownButton: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: 50,
-        borderRadius: 8,
-        borderWidth: 1,
-        paddingHorizontal: 15,
-        marginBottom: 16,
-    },
-    dropdownButtonText: {
         flex: 1,
+        paddingVertical: Spacing.base,
     },
-    dropdown: {
-        borderRadius: 8,
-        borderWidth: 1,
+    hint: {
+        ...Typography.small,
+        marginTop: Spacing.sm,
     },
-    dropdownItem: {
-        padding: 15,
-        height: 50,
-        justifyContent: 'center',
-    },
-    dropdownItemText: {},
-    selectFile: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        gap: 5,
-        height: 50,
-        borderRadius: 8,
-        borderWidth: 1,
-        paddingHorizontal: 15,
-    }
 })
