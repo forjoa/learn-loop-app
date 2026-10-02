@@ -12,7 +12,7 @@ import {
 } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming, withSpring, Easing } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Href, router } from 'expo-router'
+import { Href, router, useLocalSearchParams } from 'expo-router'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import { Colors } from '@/constants/Colors'
 import { profileImages } from '@/assets/profile-images'
@@ -60,6 +60,9 @@ export default function Register() {
     const [registering, setRegistering] = useState(false)
     const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
     const {register, error} = useAuth()
+    // Carried along when this screen was opened from the "join a topic" link flow,
+    // forwarded back to login so it survives the register -> login hop.
+    const { redirectTopicId } = useLocalSearchParams<{ redirectTopicId?: string }>()
 
     const entrance = useSharedValue(0)
     useEffect(() => {
@@ -82,7 +85,7 @@ export default function Register() {
             const result = await register(name, email, password, role, profileImage)
 
             if (result.success) {
-                router.push('/(auth)')
+                router.replace(redirectTopicId ? { pathname: '/(auth)', params: { redirectTopicId } } as Href : '/(auth)')
             } else {
                 Alert.alert('Error', result.error || 'Hubo un problema al registrarse')
             }
@@ -95,6 +98,14 @@ export default function Register() {
     }
 
     const goTo = (route: Href) => {
+        // When carrying a join redirect, always replace with the param forwarded -
+        // router.back() here could land on the join screen instead of login, since
+        // this screen may have been opened directly from that link.
+        if (redirectTopicId) {
+            router.replace({ pathname: route, params: { redirectTopicId } } as Href)
+            return
+        }
+
         if (router.canGoBack()) {
             router.back()
         } else {

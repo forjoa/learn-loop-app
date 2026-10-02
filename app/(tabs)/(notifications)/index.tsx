@@ -123,7 +123,7 @@ export default function NotificationScreen() {
                 visible={showAlert}
                 title={selectedNotification?.title!}
                 message={selectedNotification?.content!}
-                confirmText="Aceptar"
+                confirmText={selectedNotification?.enrollmentId ? 'Aceptar' : 'Entendido'}
                 denyText="Rechazar"
                 cancelText="Cancelar"
                 onConfirm={() => {
@@ -135,12 +135,13 @@ export default function NotificationScreen() {
                 onCancel={() => {
                     setShowAlert(false)
                 }}
-                onDeny={() => {
-                    if (selectedNotification?.enrollmentId) {
-                        enrollmentAction(selectedNotification.enrollmentId, 'deny')
-                    }
+                // Only a still-pending request is actionable - a resolved one (the
+                // student's "accepted"/"rejected" notification) has no enrollmentId
+                // and should just read as informational, with no deny option.
+                onDeny={selectedNotification?.enrollmentId ? () => {
+                    enrollmentAction(selectedNotification.enrollmentId!, 'deny')
                     setShowAlert(false)
-                }}
+                } : undefined}
                 theme={theme}
             />
         </>

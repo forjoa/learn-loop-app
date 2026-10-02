@@ -12,7 +12,7 @@ import {
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming, Easing } from 'react-native-reanimated'
 import { useAuth } from '@/hooks/useAuth'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Href, router } from 'expo-router'
+import { Href, RelativePathString, router, useLocalSearchParams } from 'expo-router'
 import { Colors } from '@/constants/Colors'
 import { GlassSurface } from '@/components/ui/glass-view'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,9 @@ export default function Login() {
   const { login, loading } = useAuth()
   const [loginError, setLoginError] = useState<string | null>(null)
   const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
+  // Carried along when this screen was opened from the "join a topic" link flow,
+  // so a successful login lands back there instead of the usual home screen.
+  const { redirectTopicId } = useLocalSearchParams<{ redirectTopicId?: string }>()
 
   const entrance = useSharedValue(0)
   useEffect(() => {
@@ -43,13 +46,25 @@ export default function Login() {
 
     const result = await login(email, password)
     if (result.success) {
-      router.push('/(tabs)/(home)')
+      if (redirectTopicId) {
+        router.replace(`/join/${redirectTopicId}` as RelativePathString)
+      } else {
+        router.push('/(tabs)/(home)')
+      }
     } else {
       setLoginError(result.error || 'Error al iniciar sesión')
     }
   }
 
   const goTo = (route: Href) => {
+    // When carrying a join redirect, always replace with the param forwarded -
+    // router.back() here could land on the join screen instead of register/login,
+    // since this screen may have been opened directly from that link.
+    if (redirectTopicId) {
+      router.replace({ pathname: route, params: { redirectTopicId } } as Href)
+      return
+    }
+
     if (router.canGoBack()) {
       router.back()
     } else {

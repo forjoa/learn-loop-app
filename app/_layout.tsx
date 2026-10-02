@@ -87,6 +87,10 @@ function RootLayoutNav() {
                             options={{ headerShown: false }}
                         />
                     </Stack.Protected>
+
+                    {/* Not wrapped in Stack.Protected: reachable whether or not the
+                        visitor is logged in, since it's opened from a shared link. */}
+                    <Stack.Screen name="join/[topicId]" options={{ headerShown: false }} />
                 </Stack>
                 <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'}/>
             </ThemeProvider>
