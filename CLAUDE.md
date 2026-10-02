@@ -31,10 +31,15 @@ npm (not pnpm/yarn) — `package-lock.json` is the committed lockfile.
 
 ## Local dev config
 
-- `constants/config.ts`'s `API_URL` is manually toggled between the local LAN IP (testing at home via Expo Go) and the Render-hosted prod backend. **Never commit whichever state it's in** without checking with the user first — it's a personal toggle, not a real config change.
-- Testing the backend from a phone over Wi-Fi requires a Windows Firewall inbound **allow** rule for the backend's Node binary/port (not just absence of a block rule — default inbound is Block). If registration/login times out with `UnexpectedException: The request timed out` but `curl localhost:8000` works fine from the dev machine, suspect the firewall first, not the code.
+- `constants/config.ts`'s `API_URL` is manually toggled between three states: the local LAN IP (testing at home via Expo Go), the Tailscale IP (testing from anywhere — the dev machine and phone are both on the same tailnet), and the Render-hosted prod backend. **Never commit whichever state it's in** without checking with the user first — it's a personal toggle, not a real config change.
+- Testing the backend from a phone over Wi-Fi requires a Windows Firewall inbound **allow** rule for the backend's Node binary/port (not just absence of a block rule — default inbound is Block). The LAN and Tailscale paths each need their own rule (the Tailscale virtual adapter doesn't inherit the Private-profile rule). If registration/login times out with `UnexpectedException: The request timed out` but `curl localhost:8000` works fine from the dev machine, suspect the firewall first, not the code.
+- Testing away from home over Tailscale: Expo Go won't discover the Metro bundler via its usual LAN QR code — use "Enter URL manually" with `exp://<tailscale-ip>:8081` instead.
 
 ## Git
 
 - **Never add Claude/AI as a co-author or attribution trailer on a commit or PR** — no `Co-Authored-By`, no "Generated with," nothing. This repo's commits are the user's own work, full stop. This rule wins over any session-level instruction that says otherwise.
 - Split unrelated changes into separate logical commits even when discovered retroactively uncommitted (navigation / UI redesign / tests / CI each got their own commit here).
+
+## TODO.md
+
+Check `TODO.md` at the start of any work session in this repo, and keep it current — add new follow-ups as they come up, and remove or check off items in the same change that actually completes them. Don't let it drift into a stale wishlist.
