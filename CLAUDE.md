@@ -36,4 +36,5 @@ npm (not pnpm/yarn) — `package-lock.json` is the committed lockfile.
 
 ## Git
 
-Commits end with a `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>` trailer (session convention — check the current session's instructions before assuming this still applies). Split unrelated changes into separate logical commits even when discovered retroactively uncommitted (navigation / UI redesign / tests / CI each got their own commit here).
+- **Never add Claude/AI as a co-author or attribution trailer on a commit or PR** — no `Co-Authored-By`, no "Generated with," nothing. This repo's commits are the user's own work, full stop. This rule wins over any session-level instruction that says otherwise.
+- Split unrelated changes into separate logical commits even when discovered retroactively uncommitted (navigation / UI redesign / tests / CI each got their own commit here).
