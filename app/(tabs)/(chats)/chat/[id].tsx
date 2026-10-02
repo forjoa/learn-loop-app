@@ -11,7 +11,7 @@ import {
   Text,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { Colors } from '@/constants/Colors'
 import { GlassSurface } from '@/components/ui/glass-view'
