@@ -5,10 +5,12 @@ import {
   Pressable,
   StyleSheet,
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
   useColorScheme,
   Text,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { Colors } from '@/constants/Colors'
@@ -19,7 +21,8 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
 import * as Haptics from 'expo-haptics'
 import { API_URL } from '@/constants/config'
-import { Message } from '@/lib/interfaces'
+import { ChatDetail, Message } from '@/lib/interfaces'
+import { generateDeterministicHexColorFromUUID } from '@/lib/utils'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useAuth } from '@/hooks/useAuth'
 import { useTabBarVisibility } from '@/contexts/TabBarContext'
@@ -70,10 +73,13 @@ function MessageBubble({ message, isMine, theme, getInitials }: { message: Messa
 export default function ChatScreen() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
+  const [chatDetail, setChatDetail] = useState<ChatDetail | null>(null)
   const [socket, setSocket] = useState<Socket | null>(null)
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
   const colorScheme = useColorScheme() === 'light' ? 'light' : 'dark'
   const messagesEndRef = useRef<ScrollView>(null)
   const { user } = useAuth()
+  const insets = useSafeAreaInsets()
   const sendScale = useSharedValue(1)
   const sendAnimatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: sendScale.value }] }))
 
@@ -92,6 +98,22 @@ export default function ChatScreen() {
     setSocket(newSocket)
 
     return () => newSocket.close()
+  }, [])
+
+  useEffect(() => {
+    // KeyboardAvoidingView already pushes this view up by the keyboard's height, so
+    // the static bottom safe-area inset would just add an extra gap above the
+    // keyboard - only apply it while the keyboard is hidden.
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
+
+    const showSub = Keyboard.addListener(showEvent, () => setIsKeyboardVisible(true))
+    const hideSub = Keyboard.addListener(hideEvent, () => setIsKeyboardVisible(false))
+
+    return () => {
+      showSub.remove()
+      hideSub.remove()
+    }
   }, [])
 
   useEffect(() => {
@@ -117,6 +139,26 @@ export default function ChatScreen() {
     }
 
     loadMessages()
+  }, [id])
+
+  useEffect(() => {
+    const loadChatDetail = async () => {
+      const t = await SecureStore.getItemAsync('authToken')
+
+      const result = await fetch(`${API_URL}/chats/chat?id=${id}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${t}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (result.ok) {
+        setChatDetail(await result.json())
+      }
+    }
+
+    loadChatDetail()
   }, [id])
 
   useEffect(() => {
@@ -173,20 +215,42 @@ export default function ChatScreen() {
     }
   }
 
+  const otherMembers = chatDetail?.members.filter((member) => member.id !== user?.id) ?? []
+  const participantsLabel =
+    otherMembers.length === 0
+      ? ''
+      : otherMembers.length <= 2
+        ? otherMembers.map((member) => member.name).join(', ')
+        : `${otherMembers[0].name} y ${otherMembers.length - 1} más`
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
       <GlassSurface tint={colorScheme} radius={0} style={styles.header}>
-        <Pressable style={styles.title} onPress={() => router.back()}>
+        <Pressable onPress={() => router.back()}>
           <Feather
             name="arrow-left"
             size={20}
             color={Colors[colorScheme].textSecondary}
           />
-          <Text style={[Typography.bodyStrong, { color: Colors[colorScheme].text }]}>{messages[0] ? messages[0].chat?.topic?.title : ''}</Text>
         </Pressable>
+        {!!chatDetail && (
+          <View style={[styles.avatar, { backgroundColor: generateDeterministicHexColorFromUUID(chatDetail.id) }]}>
+            <Text style={styles.avatarText}>{chatDetail.topicName.substring(0, 2).toUpperCase()}</Text>
+          </View>
+        )}
+        <View style={styles.headerTexts}>
+          <Text style={[Typography.bodyStrong, { color: Colors[colorScheme].text }]} numberOfLines={1}>
+            {chatDetail?.topicName ?? ''}
+          </Text>
+          {!!participantsLabel && (
+            <Text style={[Typography.small, { color: Colors[colorScheme].textSecondary }]} numberOfLines={1}>
+              {participantsLabel}
+            </Text>
+          )}
+        </View>
       </GlassSurface>
 
       <ScrollView
@@ -210,7 +274,11 @@ export default function ChatScreen() {
           ))}
       </ScrollView>
 
-      <GlassSurface tint={colorScheme} radius={0} style={styles.inputContainer}>
+      <GlassSurface
+        tint={colorScheme}
+        radius={0}
+        style={[styles.inputContainer, { paddingBottom: Spacing.base + (isKeyboardVisible ? 0 : insets.bottom) }]}
+      >
         <TextInput
           style={[
             styles.input,
@@ -283,15 +351,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     overflow: 'hidden',
-    paddingTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight + Spacing.sm,
     padding: Spacing.lg,
-  },
-  title: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: Spacing.sm,
     gap: Spacing.sm,
+  },
+  headerTexts: {
+    flex: 1,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    ...Typography.small,
+    fontWeight: '700',
+    color: '#fff',
   },
   chatList: {
     marginTop: Spacing.sm,

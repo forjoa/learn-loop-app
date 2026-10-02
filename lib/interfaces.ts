@@ -52,6 +52,28 @@ export interface DetailedTopic extends Topic {
   users: User[]
   owner: Owner
   posts: Post[]
+  chatId: string | null
+}
+
+export interface TopicPreview {
+  id: string
+  title: string
+  description: string
+  ownerId: string
+  ownerName: string
+  memberCount: number
+}
+
+export type EnrollmentStatusValue = 'PENDING' | 'APPROVED' | 'REJECTED'
+
+export interface EnrollmentStatus {
+  id: string
+  status: EnrollmentStatusValue
+}
+
+export interface PendingEnrollment {
+  id: string
+  user: Pick<User, 'id' | 'name' | 'email' | 'photo'>
 }
 
 export interface File {
@@ -77,6 +99,13 @@ export interface Chat {
   lastMessage: string
   lastMessageDate: string
   users: User[]
+}
+
+export interface ChatDetail {
+  id: string
+  topicId: string
+  topicName: string
+  members: Pick<User, 'id' | 'name' | 'photo'>[]
 }
 
 export interface Message {
