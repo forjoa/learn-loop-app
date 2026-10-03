@@ -26,7 +26,6 @@
     ]
   },
   "dependencies": {
-    "@expo/ui": "~57.0.21",
     "@expo/vector-icons": "^15.0.2",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
